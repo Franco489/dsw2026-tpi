@@ -1,9 +1,30 @@
-﻿namespace Dsw2026Tpi.Domain.Entities;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
-public abstract class EntityBase(Guid? id = null)
+namespace Dsw2026Tpi.Domain.Entities
 {
-    public Guid Id { get; init; } = id ?? Guid.NewGuid();
+    public abstract class EntityBase
+    {
+        public Guid Id { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime UpdatedAt { get; set; } = DateTime.Now;
+        public bool Deleted { get; set; } = false;
+        protected EntityBase(Guid? id = null)
+        {
+            Id = id ?? Guid.NewGuid();
+        }
 
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
+        public void UpdateEntity(DateTime updateDate) 
+        {
+            if (updateDate.CompareTo(UpdatedAt) <= 0) //TODO: Debería tirar una exception?
+            {
+                //throw new DateValidationException(); 
+            }
+        }
+        public void Delete() 
+        {
+            Deleted = true;
+        }
+    }
 }

@@ -1,31 +1,15 @@
-﻿namespace Dsw2026Tpi.Domain.Entities;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
-public class Doctor: EntityBase
+namespace Dsw2026Tpi.Domain.Entities
 {
-    public string Name { get; init; }
-    public string LicenseNumber { get; init; }
-    public bool IsActive { get; private set; }
-    public Guid? SpecialityId { get; set; }
-    public Speciality? Speciality { get; private set; }
-
-    #region Constructor for EF
-#pragma warning disable CS8618
-    private Doctor()
+    public class Doctor: EntityBase
     {
-    }
-#pragma warning restore CS8618
-    #endregion
-
-    public Doctor(string name, string licenseNumber, Speciality speciality, Guid? id = null) : base(id)
-    {
-        Name = name;
-        LicenseNumber = licenseNumber;
-        Speciality = speciality;
-        IsActive = true;
-    }
-
-    public void Deactivate()
-    {
-        IsActive = false;
+        public string Name { get; set; }
+        public string LicenseNumber { get; set; }
+        public Speciality Speciality { get; set; }
+        public Guid SpecialityId { get; set; }
+        public List<Availability> AvailabilityRules { get; set; }
     }
 }
