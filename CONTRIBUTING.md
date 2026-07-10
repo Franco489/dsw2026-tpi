@@ -1,8 +1,6 @@
 # COMO COLABORAR (v1)
 A continuación, presentamos las convenciones para colaborar en este proyecto.
 
-## Idioma
-- Se prefieren los métodos y elementos de código en Español.
 ## Commits
 Adoptamos la siguiente convención para realizar commits en este proyecto:
 - Add: Adición de archivos relevantes (p ej: JSON con datos, clases, métodos/funcionalidades, etc)
@@ -12,6 +10,9 @@ Adoptamos la siguiente convención para realizar commits en este proyecto:
 
 Ejemplo de uso: "Add: Clase PersistenceEf para la implementación de persistencia con EntityFramework."  
 Ejemplo 2: "Add: CONTRIBUTING.md"
+
+## APIs
+- No nombramos los endpoints con el nombre del verbo (PostDoctor, PutSpeciality, etc) sino con el nombre de la accion (CreateDoctor, UpdateSpeciality)
 
 ## Preferencias adicionales
 Respecto a las estructuras de código como while, if, try-catch, foearch, etc. Preferimos la siguiente notación:
