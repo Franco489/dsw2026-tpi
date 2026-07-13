@@ -4,7 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace Dsw2026Tpi.Application.Services;
+namespace Dsw2026Tpi.Application.Services.Security;
 
 public class JwtService
 {

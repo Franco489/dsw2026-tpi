@@ -1,6 +1,7 @@
 ﻿using Dsw2026Tpi.Api.Services;
 using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.Application.Services;
+using Dsw2026Tpi.Application.Services.Security;
 using Dsw2026Tpi.Data;
 using Dsw2026Tpi.Domain.Interfaces;
 
