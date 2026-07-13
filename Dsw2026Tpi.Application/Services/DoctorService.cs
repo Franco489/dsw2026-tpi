@@ -14,6 +14,11 @@ public class DoctorService : IDoctorService
         _persistence = persistence;
     }
 
+    public Task CreateDoctor(DoctorModel.Request request)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<Pagination<DoctorModel.Response>> GetAll(int pageSize, int pageIndex, string? name = null)
     {
         var doctors = await _persistence.Paginate<Doctor, string>(pageSize, pageIndex, d => string.IsNullOrWhiteSpace(name) ||

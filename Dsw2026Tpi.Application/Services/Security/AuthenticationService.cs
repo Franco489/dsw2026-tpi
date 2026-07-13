@@ -8,7 +8,7 @@ using Dsw2026Tpi.Data.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
-namespace Dsw2026Tpi.Application.Services;
+namespace Dsw2026Tpi.Application.Services.Security;
 
 public class AuthenticationService : IAuthenticationService
 {
