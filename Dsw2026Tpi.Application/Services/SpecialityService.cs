@@ -1,6 +1,5 @@
 ﻿using Dsw2026Tpi.Application.Intefaces;
 using Dsw2026Tpi.Application.Models;
-using Dsw2026Tpi.Data.Interface;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
 using System;
