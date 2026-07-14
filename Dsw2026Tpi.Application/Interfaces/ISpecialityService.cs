@@ -8,10 +8,9 @@ namespace Dsw2026Tpi.Application.Interfaces
 {
     public interface ISpecialityService
     {
-        //Task<Speciality> GetSpecialityById(Guid id);
         Task<Pagination<SpecialityModel.FilterResponse>> FilterSpecialityByName(int pageSize, int pageIndex, string? name = null);
-        //Task AddSpeciality(SpecialityModel.CreateRequest request);
-        //Task UpdateSpeciality(Guid id, SpecialityModel.UpdateRequest request);
-        //Task DeleteSpeciality(Guid id);
+        Task AddSpeciality(SpecialityModel.CreateRequest request);
+        Task UpdateSpeciality(Guid id, SpecialityModel.UpdateRequest request);
+        Task RemoveSpeciality(Guid id);
     }
 }

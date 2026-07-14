@@ -2,6 +2,7 @@
 using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
+using Dsw2026Tpi.CrossCutting.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -18,42 +19,40 @@ namespace Dsw2026Tpi.Application.Services
 
         public async Task<Pagination<SpecialityModel.FilterResponse>> FilterSpecialityByName(int pageSize, int pageIndex, string? name = null)
         {
-            //if (name == null)
-            //{
-            //    var spec = await _persistence.GetAll<Speciality>();
-            //    return spec.Where(s => s.IsActive).Select(s => new SpecialityModel.FilterResponse(
-            //        s.Id,
-            //        s.Name,
-            //        s.Description));
-            //}
-            //var result = await _persistence.GetFiltered<Speciality>(s => s.Name.Contains(name));
-            //return result.Where(s => s.IsActive).Select(s => new SpecialityModel.FilterResponse(
-            //    s.Id,
-            //    s.Name,
-            //    s.Description));
-
             var specialities = await _persistence.Paginate<Speciality, string>(pageSize, pageIndex, s => string.IsNullOrWhiteSpace(name) ||
                                                    s.Name.Contains(name), x => x.Name);
             return specialities.Map(s => new SpecialityModel.FilterResponse(
                 s.Id,
                 s.Name,
                 s.Description));
-
         }
 
         public async Task AddSpeciality(SpecialityModel.CreateRequest request)
         {
-            throw new NotImplementedException();
+            var speciality = new Speciality(request.name, request.description);
+            await _persistence.Add<Speciality>(speciality);
         }
 
         public async Task UpdateSpeciality(Guid id, SpecialityModel.UpdateRequest request)
         {
-            throw new NotImplementedException();
+            var speciality = await _persistence.GetById<Speciality>(id);
+            if(speciality == null)
+            {
+                throw new EntityNotFoundException($"{id}");
+            }
+            speciality.Update(request.name, request.description);
+            await _persistence.Update<Speciality>(speciality);
         }
 
-        public async Task DeleteSpeciality(Guid id)
+        public async Task RemoveSpeciality(Guid id)
         {
-            throw new NotImplementedException();
+            var speciality = await _persistence.GetById<Speciality>(id);
+            if(speciality ==null)
+            {
+                throw new EntityNotFoundException($"{id}");
+            }
+            speciality.Delete();
+            await _persistence.Update<Speciality>(speciality);
         }   
     }
 }
