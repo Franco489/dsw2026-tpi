@@ -1,6 +1,7 @@
 ﻿using Dsw2026Tpi.Data;
 using Dsw2026Tpi.Data.Extensions;
 using Dsw2026Tpi.Data.Identity;
+using Dsw2026Tpi.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +19,11 @@ public static class PersistenceConfigurationExtensions
         services.AddDbContext<Dsw2026TpiDbContext>(options =>
         {
             options.UseSqlServer(connectionString);
+            options.UseSeeding((c, t) =>
+            {
+                c.Seedwork<Doctor>("Sources\\doctors.json");
+                c.Seedwork<Speciality>("Sources\\specialities.json");
+            });
         });
 
         services.AddDbContext<AuthenticationDbContext>(options =>

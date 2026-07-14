@@ -1,0 +1,92 @@
+[
+  {
+    "id": "2c8f8b17-9e1b-4df4-bbb5-5c98d7e1d101",
+    "createdAt": "2026-01-10T08:30:00",
+    "updatedAt": "2026-01-10T08:30:00",
+    "deleted": false,
+    "name": "Cardiología",
+    "description": "Diagnóstico y tratamiento de enfermedades del corazón y del sistema cardiovascular.",
+    "isActive": true
+  },
+  {
+    "id": "8d6f54d7-c2f7-46d6-b2bb-9bcb6f3d2202",
+    "createdAt": "2026-01-10T08:35:00",
+    "updatedAt": "2026-01-10T08:35:00",
+    "deleted": false,
+    "name": "Pediatría",
+    "description": "Atención médica integral de niños y adolescentes.",
+    "isActive": true
+  },
+  {
+    "id": "bb3cba18-19d2-4b57-a8f3-66b2f9f33303",
+    "createdAt": "2026-01-10T08:40:00",
+    "updatedAt": "2026-01-10T08:40:00",
+    "deleted": false,
+    "name": "Traumatología",
+    "description": "Tratamiento de lesiones y enfermedades del sistema musculoesquelético.",
+    "isActive": true
+  },
+  {
+    "id": "1a8ef2c9-2b31-4c6d-bfd4-9d7f5e5c4404",
+    "createdAt": "2026-01-10T08:45:00",
+    "updatedAt": "2026-01-10T08:45:00",
+    "deleted": false,
+    "name": "Dermatología",
+    "description": "Diagnóstico y tratamiento de enfermedades de la piel, uñas y cabello.",
+    "isActive": true
+  },
+  {
+    "id": "cb8c24e1-73c5-45fd-aeb5-7b2e3d5a5505",
+    "createdAt": "2026-01-10T08:50:00",
+    "updatedAt": "2026-01-10T08:50:00",
+    "deleted": false,
+    "name": "Neurología",
+    "description": "Estudio y tratamiento de enfermedades del sistema nervioso.",
+    "isActive": true
+  },
+  {
+    "id": "d72d3f6a-0b8e-4fd8-a3cf-8e5f8a8d6606",
+    "createdAt": "2026-01-10T08:55:00",
+    "updatedAt": "2026-01-10T08:55:00",
+    "deleted": false,
+    "name": "Oftalmología",
+    "description": "Prevención, diagnóstico y tratamiento de enfermedades oculares.",
+    "isActive": true
+  },
+  {
+    "id": "e43a1e59-c2b7-4f6d-9d8a-4f2d1b9f7707",
+    "createdAt": "2026-01-10T09:00:00",
+    "updatedAt": "2026-01-10T09:00:00",
+    "deleted": false,
+    "name": "Ginecología",
+    "description": "Atención médica del aparato reproductor femenino.",
+    "isActive": true
+  },
+  {
+    "id": "f8d6b8d4-6d73-4c49-a7fd-3a1c4b8f8808",
+    "createdAt": "2026-01-10T09:05:00",
+    "updatedAt": "2026-01-10T09:05:00",
+    "deleted": false,
+    "name": "Psiquiatría",
+    "description": "Diagnóstico y tratamiento de trastornos mentales.",
+    "isActive": true
+  },
+  {
+    "id": "9f4d7b81-3c7d-4e79-b1d8-0d2e6f1a9909",
+    "createdAt": "2026-01-10T09:10:00",
+    "updatedAt": "2026-01-10T09:10:00",
+    "deleted": false,
+    "name": "Endocrinología",
+    "description": "Tratamiento de enfermedades relacionadas con el sistema endocrino y las hormonas.",
+    "isActive": true
+  },
+  {
+    "id": "ab5f8d92-4f2a-4e73-a5f7-1f3d8b2faa10",
+    "createdAt": "2026-01-10T09:15:00",
+    "updatedAt": "2026-01-10T09:15:00",
+    "deleted": false,
+    "name": "Oncología",
+    "description": "Prevención, diagnóstico y tratamiento del cáncer.",
+    "isActive": true
+  }
+]
