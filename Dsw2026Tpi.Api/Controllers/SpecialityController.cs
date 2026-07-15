@@ -15,7 +15,7 @@ public class SpecialityController : AppController
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetSpecialityByName([FromQuery] int pageSize, [FromQuery] int pageIndex, [FromQuery] string? name = null)
+    public async Task<IActionResult> GetSpecialityByName([FromQuery] int pageSize=10, [FromQuery] int pageIndex=1, [FromQuery] string? name = null)
     {
         var specialities = await _service.FilterSpecialityByName(pageSize, pageIndex, name);
         return Ok(specialities);

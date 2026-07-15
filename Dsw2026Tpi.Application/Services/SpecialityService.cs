@@ -6,6 +6,7 @@ using Dsw2026Tpi.CrossCutting.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Dsw2026Tpi.Application.Validation;
 
 namespace Dsw2026Tpi.Application.Services
 {
@@ -40,7 +41,10 @@ namespace Dsw2026Tpi.Application.Services
             {
                 throw new EntityNotFoundException($"{id}");
             }
+            SpecialityValidator.Validate(request);
             speciality.Update(request.name, request.description);
+
+
             await _persistence.Update<Speciality>(speciality);
         }
 
