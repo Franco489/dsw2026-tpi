@@ -14,9 +14,9 @@ namespace Dsw2026Tpi.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetSpecialityByName(string? name)
+        public async Task<IActionResult> GetSpecialityByName([FromQuery] int pageSize, [FromQuery] int pageIndex, [FromQuery] string? name = null)
         {
-            return Ok(await _service.FilterSpecialityByName(name));
+            return Ok(await _service.FilterSpecialityByName(pageSize, pageIndex, name));
         }
 
         [HttpPost]
