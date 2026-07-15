@@ -1,4 +1,4 @@
-﻿using Dsw2026Tpi.Application.Models;
+﻿using Dsw2026Tpi.Application.Dtos;
 using Dsw2026Tpi.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -10,8 +10,8 @@ namespace Dsw2026Tpi.Application.Intefaces
     {
         Task<Speciality> GetSpecialityById(Guid id);
         Task<Pagination<SpecialityModel.FilterResponse>> FilterSpecialityByName(int pageSize, int pageIndex, string? name = null);
-        Task AddSpeciality(SpecialityModel.CreateRequest request);
-        Task UpdateSpeciality(Guid id,SpecialityModel.UpdateRequest request);
+        Task AddSpeciality(SpecialityModel.Request request);
+        Task UpdateSpeciality(Guid id,SpecialityModel.Request request);
         Task DeleteSpeciality(Guid id);
     }
 }

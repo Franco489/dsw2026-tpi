@@ -1,5 +1,5 @@
 ﻿using Dsw2026Tpi.Application.Intefaces;
-using Dsw2026Tpi.Application.Models;
+using Dsw2026Tpi.Application.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2026Tpi.Api.Controllers
@@ -20,14 +20,14 @@ namespace Dsw2026Tpi.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddSpeciality(SpecialityModel.CreateRequest request)
+        public async Task<IActionResult> AddSpeciality(SpecialityModel.Request request)
         {
             await _service.AddSpeciality(request);
             return Created();
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateSpeciality(Guid id, SpecialityModel.UpdateRequest request)
+        public async Task<IActionResult> UpdateSpeciality(Guid id, SpecialityModel.Request request)
         {
             await _service.UpdateSpeciality(id, request);
             return Ok();
