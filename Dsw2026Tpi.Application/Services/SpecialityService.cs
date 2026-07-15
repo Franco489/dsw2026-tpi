@@ -20,8 +20,8 @@ namespace Dsw2026Tpi.Application.Services
 
         public async Task<Pagination<SpecialityModel.FilterResponse>> FilterSpecialityByName(int pageSize, int pageIndex, string? name = null)
         {
-            var specialities = await _persistence.Paginate<Speciality, string>(pageSize, pageIndex, s => string.IsNullOrWhiteSpace(name) ||
-                                                   s.Name.Contains(name), x => x.Name);
+            var specialities = await _persistence.Paginate<Speciality, string>(pageSize, pageIndex, s => string.IsNullOrWhiteSpace(name) && s.IsActive && !s.Deleted ||
+                                                   s.Name.Contains(name) && s.IsActive && !s.Deleted, x => x.Name);
             return specialities.Map(s => new SpecialityModel.FilterResponse(
                 s.Id,
                 s.Name,
@@ -56,7 +56,7 @@ namespace Dsw2026Tpi.Application.Services
                 throw new EntityNotFoundException($"{id}");
             }
             speciality.Delete();
-            await _persistence.Update<Speciality>(speciality);
+            await _persistence.Update(speciality);
         }   
     }
 }

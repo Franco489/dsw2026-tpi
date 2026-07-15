@@ -16,6 +16,7 @@ namespace Dsw2026Tpi.Application.Validation
             {
                 throw new ValidationException("La especialidad no puede ser nula", ErrorCodes.VALIDATION_ERROR);
             }
+
             if (string.IsNullOrWhiteSpace(request.name))
             {
                 throw new ValidationException("La especialidad debe tener un nombre", ErrorCodes.VALIDATION_ERROR);
@@ -34,7 +35,7 @@ namespace Dsw2026Tpi.Application.Validation
             if (request.description.Length > 100 || request.description.Length < 10)
             {
                 throw new ValidationException("La descripcion de la especialidad debe estar entre los 10 y 100 caracteres", ErrorCodes.VALIDATION_ERROR);
-            }
+            }            
 
         }
     }
