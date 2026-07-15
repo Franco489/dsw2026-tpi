@@ -13,8 +13,6 @@ public class PersistenceEf: IPersistence
     public PersistenceEf(Dsw2026TpiDbContext context)
     {
         _context = context;
-        _context.Seedwork<Speciality>("specialities");
-        _context.Seedwork<Doctor>("doctors");
     }
 
     public async Task<T> Add<T>(T entity) where T : EntityBase
@@ -67,7 +65,7 @@ public class PersistenceEf: IPersistence
         var filtered = Include(_context.Set<T>(), includes)
                  .Where(predicate)
                  .OrderBy(sortOrder);
-
+        
         var total = await filtered.CountAsync();
 
         
