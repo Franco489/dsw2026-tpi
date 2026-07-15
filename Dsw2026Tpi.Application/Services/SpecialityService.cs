@@ -2,6 +2,7 @@
 using Dsw2026Tpi.Application.Models;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
+using Dsw2026Tpi.CrossCutting.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -35,24 +36,30 @@ namespace Dsw2026Tpi.Application.Services
         public async Task UpdateSpeciality(Guid id,SpecialityModel.UpdateRequest request)
         {
             var speciality = await _persistence.GetById<Speciality>(id);
+            if(speciality is null) 
+            {
+                throw new EntityNotFoundException(nameof(Speciality));
+            }
             speciality.Update(request.name, request.description);
-            await _persistence.Update<Speciality>(speciality);   
+            await _persistence.Update<Speciality>(speciality);
         }
 
         public async Task<IEnumerable<Speciality>> FilterSpecialityByName(string? name)
         {
             if (name == null) 
             {
-                return await _persistence.GetAll<Speciality>();
+                return await _persistence.GetFiltered<Speciality>(s => s.IsActive && !s.Deleted);
             }
-            var result = await _persistence.GetFiltered<Speciality>(s => s.Name.Contains(name));
-            result.Where(s => s.IsActive).Select(s => new SpecialityModel.FilterResponse(
+            var result = await _persistence.GetFiltered<Speciality>(s => 
+            s.Name.Contains(name) && 
+            s.IsActive && 
+            !s.Deleted);
+            result.Select(s => new SpecialityModel.FilterResponse(
                 s.Id,
                 s.Name, 
                 s.Description));
            
-            return result;
-            
+            return result;            
         }
     }
 }
