@@ -35,10 +35,10 @@ namespace Dsw2026Tpi.Application.Services
             throw new NotImplementedException();
         }
 
-        public async Task UpdateSpeciality(Guid id,SpecialityModel.Request request)
+        public async Task UpdateSpeciality(Guid id, SpecialityModel.Request request)
         {
             var speciality = await _persistence.GetById<Speciality>(id);
-            if(speciality is null) 
+            if (speciality is null)
             {
                 throw new EntityNotFoundException(nameof(Speciality));
             }
@@ -56,6 +56,17 @@ namespace Dsw2026Tpi.Application.Services
                 s.Id,
                 s.Name,
                 s.Description));
+        }
+
+        public async Task ReactivateSpeciality(Guid id)
+        {
+            var speciality = await _persistence.GetById<Speciality>(id);
+            if (speciality is null)
+            {
+                throw new EntityNotFoundException(nameof(Speciality));
+            }
+            speciality.Activate();
+            await _persistence.Update<Speciality>(speciality);
         }
     }
 }

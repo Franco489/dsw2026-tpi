@@ -13,5 +13,6 @@ namespace Dsw2026Tpi.Application.Intefaces
         Task AddSpeciality(SpecialityModel.Request request);
         Task UpdateSpeciality(Guid id,SpecialityModel.Request request);
         Task DeleteSpeciality(Guid id);
+        Task ReactivateSpeciality(Guid id);
     }
 }
