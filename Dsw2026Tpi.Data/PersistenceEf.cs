@@ -15,12 +15,19 @@ public class PersistenceEf: IPersistence
         _context = context;
     }
 
-    public async Task<T> Add<T>(T entity) where T : EntityBase
+    public async Task<List<T>> pruebas<T>(List<T> entity) where T : EntityBase
+    {
+        await _context.AddRangeAsync(entity);
+        await _context.SaveChangesAsync();
+        return entity;
+    } 
+
+    public async Task<T> Add<T>(T entity) where T : EntityBase  
     {
         await _context.AddAsync(entity);
         await _context.SaveChangesAsync();
         return entity;
-    }
+    }   
 
     public async Task<T> Delete<T>(T entity) where T : EntityBase
     {
