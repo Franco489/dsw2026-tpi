@@ -9,9 +9,9 @@ namespace Dsw2026Tpi.Domain.Entities
         public DateOnly Date { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
-        public AvailabilitySlotStatus Status { get; set; }
+        public AvailabilitySlotStatus Status { get; set; } = AvailabilitySlotStatus.AVAILABLE;
         public Availability Availability { get; set; }
         public Guid AvailabilityId { get; set; }
-        public Guid DoctorId { get; set; }
+
     }
 }
