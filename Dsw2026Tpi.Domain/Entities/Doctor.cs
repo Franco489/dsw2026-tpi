@@ -11,5 +11,24 @@ namespace Dsw2026Tpi.Domain.Entities
         public Speciality Speciality { get; set; }
         public Guid SpecialityId { get; set; }
         public List<Availability> AvailabilityRules { get; set; }
+
+        protected Doctor()
+        {
+            
+        }
+
+        public Doctor(string name, string licenseNumber, Guid specialityId)
+        {
+            Name = name;
+            LicenseNumber = licenseNumber;
+            SpecialityId = specialityId;
+        }
+
+        public void Update(string name, string licenseNumber, Guid specialityId)
+        {
+            Name = name;
+            LicenseNumber = licenseNumber;
+            SpecialityId = specialityId;
+        }
     }
 }

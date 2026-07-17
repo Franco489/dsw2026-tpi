@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2026Tpi.Api.Controllers
 {
-    [Route("api/specialities")]
+    [Route("specialities")]
     public class SpecialityController : AppController
     {
         private readonly ISpecialityService _service;
@@ -14,7 +14,7 @@ namespace Dsw2026Tpi.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetSpecialityByName([FromQuery] int pageSize, [FromQuery] int pageIndex, [FromQuery] string? name = null)
+        public async Task<IActionResult> GetSpecialityByName([FromQuery] int pageSize = 10, [FromQuery] int pageIndex = 0, [FromQuery] string? name = null)
         {
             return Ok(await _service.FilterSpecialityByName(pageSize, pageIndex, name));
         }
@@ -40,7 +40,7 @@ namespace Dsw2026Tpi.Api.Controllers
             return Ok();
         }
 
-        [HttpPut]
+        [HttpPut("/activate")]
         public async Task<IActionResult> ReactivateSpeciality([FromQuery] Guid id)
         {
             await _service.ReactivateSpeciality(id);
