@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dsw2026Tpi.Api.Controllers;
 
 [Route("doctors")]
-[Authorize(Policy = Policies.AdminPolicy)]
+//[Authorize(Policy = Policies.AdminPolicy)]
 public class DoctorController : AppController
 {
     private readonly IDoctorService _service;
@@ -18,7 +18,6 @@ public class DoctorController : AppController
     }
 
     [HttpGet]
-    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll([FromQuery]int pageSize = 10, [FromQuery]int pageIndex = 0, [FromQuery]string? name = null)
     {
@@ -28,7 +27,6 @@ public class DoctorController : AppController
 
     [HttpPost]
     [AllowAnonymous]
-
     public async Task<IActionResult> CreateDoctor(DoctorModel.Request request)
     {
         await _service.CreateDoctor(request);

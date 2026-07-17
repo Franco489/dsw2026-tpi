@@ -16,9 +16,17 @@ public class DoctorService : IDoctorService
         _persistence = persistence;
     }
 
-    public Task CreateDoctor(DoctorModel.Request request)
+    public async Task CreateDoctor(DoctorModel.Request request)
     {
-        throw new NotImplementedException();
+        DoctorValidator.Validate(request);
+        var speciality = await _persistence.GetById<Speciality>(request.SpecialityId);
+        if(speciality == null)
+        {
+            throw new EntityNotFoundException(nameof(Speciality));
+        }
+
+        var doctor = new Doctor(request.Name, request.LicenseNumber, request.SpecialityId);
+        await _persistence.Add(doctor);
     }
 
     public async Task<Pagination<AvailabilityModel.DaySchedule>> GetAvailabilities(Guid id, int pageSize, int pageIndex)
@@ -38,8 +46,8 @@ public class DoctorService : IDoctorService
 
     public async Task<Pagination<DoctorModel.Response>> GetAll(int pageSize, int pageIndex, string? name = null)
     {
-        var doctors = await _persistence.Paginate<Doctor, string>(pageSize, pageIndex, d => string.IsNullOrWhiteSpace(name) ||
-                                                   d.Name.Contains(name), x => x.Name, nameof(Doctor.Speciality));
+        var doctors = await _persistence.Paginate<Doctor, string>(pageSize, pageIndex, d => string.IsNullOrWhiteSpace(name) && !d.Deleted ||
+                                                   d.Name.Contains(name) && !d.Deleted, x => x.Name, nameof(Doctor.Speciality));
 
         return doctors.Map(d => new DoctorModel.Response(d.Id, d.Name, d.LicenseNumber,
             new DoctorModel.SpecialityDto(d.Speciality?.Id, d.Speciality?.Name)));

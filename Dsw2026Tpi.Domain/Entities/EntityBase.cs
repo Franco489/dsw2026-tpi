@@ -15,17 +15,18 @@ namespace Dsw2026Tpi.Domain.Entities
             Id = id ?? Guid.NewGuid();
         }
 
-        public void UpdateEntity(DateTime updateDate) 
+        public void UpdateEntity(DateTime updateDate)
         {
             if (updateDate.CompareTo(UpdatedAt) <= 0) //TODO: Debería tirar una exception?
             {
                 //throw new DateValidationException(); 
             }
         }
-        public void Delete() 
+        public void Delete()
         {
             Deleted = true;
         }
+
         public void Activate()
         {
             Deleted = false;

@@ -27,18 +27,22 @@ namespace Dsw2026Tpi.Application.Services
         public async Task DeleteSpeciality(Guid id)
         {
             var speciality = await _persistence.GetById<Speciality>(id);
+            if(speciality == null)
+            {
+                throw new EntityNotFoundException(nameof(Speciality));
+            }
             speciality.Delete();
-            _persistence.Update(speciality);
+            await _persistence.Update(speciality);
         }
         public Task<Speciality> GetSpecialityById(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public async Task UpdateSpeciality(Guid id,SpecialityModel.Request request)
+        public async Task UpdateSpeciality(Guid id, SpecialityModel.Request request)
         {
             var speciality = await _persistence.GetById<Speciality>(id);
-            if(speciality is null) 
+            if (speciality is null)
             {
                 throw new EntityNotFoundException(nameof(Speciality));
             }
@@ -56,6 +60,17 @@ namespace Dsw2026Tpi.Application.Services
                 s.Id,
                 s.Name,
                 s.Description));
+        }
+
+        public async Task ReactivateSpeciality(Guid id)
+        {
+            var speciality = await _persistence.GetById<Speciality>(id);
+            if (speciality is null)
+            {
+                throw new EntityNotFoundException(nameof(Speciality));
+            }
+            speciality.Activate();
+            await _persistence.Update<Speciality>(speciality);
         }
     }
 }

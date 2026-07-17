@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2026Tpi.Api.Controllers
 {
-    [Route("api/specialities")]
+    [Route("specialities")]
     public class SpecialityController : AppController
     {
         private readonly ISpecialityService _service;
@@ -37,6 +37,13 @@ namespace Dsw2026Tpi.Api.Controllers
         public async Task<IActionResult> DeleteSpeciality([FromRoute] Guid id)
         {
             await _service.DeleteSpeciality(id);
+            return Ok();
+        }
+
+        [HttpPut("/activate")]
+        public async Task<IActionResult> ReactivateSpeciality([FromQuery] Guid id)
+        {
+            await _service.ReactivateSpeciality(id);
             return Ok();
         }
 
