@@ -27,8 +27,12 @@ namespace Dsw2026Tpi.Application.Services
         public async Task DeleteSpeciality(Guid id)
         {
             var speciality = await _persistence.GetById<Speciality>(id);
+            if(speciality == null)
+            {
+                throw new EntityNotFoundException(nameof(Speciality));
+            }
             speciality.Delete();
-            _persistence.Update(speciality);
+            await _persistence.Update(speciality);
         }
         public Task<Speciality> GetSpecialityById(Guid id)
         {
