@@ -1,5 +1,7 @@
 ﻿using Dsw2026Tpi.Application.Dtos;
 using Dsw2026Tpi.Application.Interfaces;
+using Dsw2026Tpi.Application.Validation;
+using Dsw2026Tpi.CrossCutting.Exceptions;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
 
@@ -27,18 +29,43 @@ public class DoctorService : IDoctorService
         return doctors.Map(d => new DoctorModel.Response(d.Id, d.Name, d.LicenseNumber,
             new DoctorModel.SpecialityDto(d.Speciality?.Id, d.Speciality?.Name)));
     }
-    public Task UpdateDoctor(Guid id, DoctorModel.Request request)
+    public async Task UpdateDoctor(Guid id, DoctorModel.Request request)
     {
-        throw new NotImplementedException();
+        var speciality = await _persistence.GetById<Speciality>(request.SpecialityId);
+        if (speciality == null)
+        {
+            throw new EntityNotFoundException(nameof(Speciality));
+        }
+
+        var doctor = await _persistence.GetById<Doctor>(id);
+        if (doctor == null)
+        {
+            throw new EntityNotFoundException(nameof(Doctor));
+        }
+        DoctorValidator.Validate(request);
+        doctor.Update(request.Name, request.LicenseNumber, request.SpecialityId);
+        await _persistence.Update(doctor);
     }
 
-    public Task DeleteDoctor(Guid id)
+    public async Task DeleteDoctor(Guid id)
     {
-        throw new NotImplementedException();
+        var doctor = await _persistence.GetById<Doctor>(id);
+        if (doctor == null)
+        {
+            throw new EntityNotFoundException(nameof(Doctor));
+        }
+        doctor.Delete();
+        await _persistence.Update(doctor);
     }
 
-    public Task ReactivateDoctor(Guid id)
+    public async Task ReactivateDoctor(Guid id)
     {
-        throw new NotImplementedException();
+        var doctor = await _persistence.GetById<Doctor>(id);
+        if (doctor == null)
+        {
+            throw new EntityNotFoundException(nameof(Doctor));
+        }
+        doctor.Activate();
+        await _persistence.Update(doctor);
     }
 }
