@@ -3,6 +3,8 @@ using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.Application.Validation;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
+using Dsw2026Tpi.CrossCutting.Exceptions;
+using Dsw2026Tpi.Application.Utils;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -20,108 +22,60 @@ public class AvailabilityService : IAvailabilityService
     public async Task CreateAvailabilitiesAsync(AvailabilityModel.Request request)
     {
         var doctor = await _persistence.GetById<Doctor>(request.DoctorId);
-        if(doctor == null)
+        if (doctor == null)
         {
-            throw new ArgumentException($"No se encontró un doctor con el ID {request.DoctorId}");
+            throw new EntityNotFoundException($"No se encontró un doctor con el ID {request.DoctorId}");
         }
+        var actualDate = DateOnly.FromDateTime(DateTime.Now);
+        var actualMonth = actualDate.Month;
+        var actualYear = actualDate.Year;
+        var numOfDays = DateTime.DaysInMonth(actualYear, actualMonth);
 
-        //Obtiene solo la fecha actual, sin la hora
-        var hoy = DateOnly.FromDateTime(DateTime.Now);
+        var avaRules = new List<Availability>();
 
-        //Lo mismo con el mes y el año actual
-        var mesActual = hoy.Month;
-        var anioActual = hoy.Year;
-
-        //Obtiene la cantidad de días del mes actual en base al año
-        var diasEnElMes = DateTime.DaysInMonth(anioActual, mesActual);
-
-        //Crea una lista para las nuevas reglas de disponibilidad
-        var nuevasReglas = new List<Availability>();
-
-       //La request tiene una lista con cada uno de los dias de la semana, se itera sobre cada uno de ellos
-        foreach (var scheduleDto in request.Days)
+        foreach (var daySchedule in request.Days)
         {
-            var diaCsharp = TraducirDia(scheduleDto.day);
-
-
-            //Se crea una nueva regla de disponibilidad, con el mes, año, día de la semana, hora de inicio y hora de fin del turno del doctor
-            var regla = new Availability
+            var dayOfWeek = daySchedule.Day.toDayOfWeek();
+            var avaRule = new Availability
             {
-                DoctorId = request.DoctorId,
-                Month = (byte)mesActual,
-                Year = (short)anioActual,
-                DayOfWeek = (byte)diaCsharp,
-                StartTime = scheduleDto.startTime,
-                EndTime = scheduleDto.endTime,
-
-                //Crea una lista de slots de disponibilidad vacía
-                Slots = new List<AvailabilitySlot>() 
+                DoctorId = doctor.Id,
+                Doctor = doctor,
+                Month = (byte)actualMonth,
+                Year = (short)actualYear,
+                DayOfWeek = (byte)dayOfWeek,
+                StartTime = daySchedule.StartTime,
+                EndTime = daySchedule.EndTime
             };
 
-            //Se itera desde el día actual hasta el último día del mes, para crear los slots de disponibilidad
-            for (int dia = hoy.Day; dia <= diasEnElMes; dia++)
+            for (int d = actualDate.Day; d <= numOfDays; d++)
             {
-                var fechaIteracion = new DateOnly(anioActual, mesActual, dia);
-
-                //Verificamos si el día de la iteración coincide con el día de la semana del turno del doctor
-                if (fechaIteracion.DayOfWeek == diaCsharp)
+                var iterationDate = new DateOnly(actualYear, actualMonth, d);
+                var slotStartTime = daySchedule.StartTime;
+                if (iterationDate.DayOfWeek == dayOfWeek)
                 {
-                    //Seteamos como hora de inicio, la hora de inicio del turno del doctor
-                    var horaInicioTurno = scheduleDto.startTime;
-
-                    //Mientras la hora de inicio del turno del paciente sea menor a la hora de fin del turno del doctor, se crean los slots de disponibilidad
-                    while (horaInicioTurno < scheduleDto.endTime)
+                    while (slotStartTime < daySchedule.EndTime)
                     {
-                        //Se calcula la hora de fin del turno en base a la hora de inicio
-                        var horaFinTurno = horaInicioTurno.AddMinutes(30);
+                        var slotEndTime = slotStartTime.AddMinutes(30);
 
-                        //Si el turno termina después de la hora de fin del turno del doctor, se rompe el ciclo
-                        if (horaFinTurno > scheduleDto.endTime) break;
-
-                        //Se crea un slot de disponibilidad con la fecha de la iteración, hora de inicio y hora de fin del turno de 30 minutos
-                        regla.Slots.Add(new AvailabilitySlot
+                        if (slotEndTime > daySchedule.EndTime) break;
+                        avaRule.Slots.Add(new AvailabilitySlot
                         {
-                            Date = fechaIteracion,
-                            StartTime = horaInicioTurno,
-                            EndTime = horaFinTurno
-                            
+                            Date = iterationDate,
+                            StartTime = slotStartTime,
+                            EndTime = slotEndTime
                         });
-
-                        //Se establece el inicio del siguiente turno como la hora de fin del turno actual
-                        horaInicioTurno = horaFinTurno;
+                        slotStartTime = slotEndTime;
                     }
                 }
+                d += 5; // Nos ahorramos un par de iteraciones saltando a la siguiente semana
+                avaRules.Add(avaRule);
             }
-            //En resumen, primero iteramos sobre cada dia de la semana que el doctor tiene disponible
-            //Luego iteramos sobre cada dia del mes contando desde el dia actual
-            //Si el dia que el doctor tiene disponible coincide con el dia de la iteracion, se crean los slots de disponibilidad
-
-
-            //Si la regla tiene slots de disponibilidad, se agrega a la lista de nuevas reglas
-            if (regla.Slots.Any())
+            await _persistence.AddRange(avaRules); // TODO: <- Optimizar. No sé si esta sea la forma más efectiva. 
+            foreach (var a in avaRules) 
             {
-                nuevasReglas.Add(regla);
+                await _persistence.AddRange(a.Slots.ToList());
             }
+            //TODO: El método funciona parcialmente. A veces registra los slots y a veces no. 
         }
-       await _persistence.pruebas(nuevasReglas);
-
     }
-
-    //Convirte el dia de entrada en español a un DayOfWeek de C#
-    private DayOfWeek TraducirDia(string diaEspanol)
-    {
-        return diaEspanol.Trim().ToUpper() switch
-        {
-            "LUNES" => DayOfWeek.Monday,
-            "MARTES" => DayOfWeek.Tuesday,
-            "MIÉRCOLES" or "MIERCOLES" => DayOfWeek.Wednesday,
-            "JUEVES" => DayOfWeek.Thursday,
-            "VIERNES" => DayOfWeek.Friday,
-            "SÁBADO" or "SABADO" => DayOfWeek.Saturday,
-            "DOMINGO" => DayOfWeek.Sunday,
-            _ => throw new ArgumentException($"El día '{diaEspanol}' no es válido.")
-        };
-    }
-
-
 }

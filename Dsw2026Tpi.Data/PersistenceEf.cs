@@ -15,7 +15,7 @@ public class PersistenceEf: IPersistence
         _context = context;
     }
 
-    public async Task<List<T>> pruebas<T>(List<T> entity) where T : EntityBase
+    public async Task<List<T>> AddRange<T>(List<T> entity) where T : EntityBase
     {
         await _context.AddRangeAsync(entity);
         await _context.SaveChangesAsync();

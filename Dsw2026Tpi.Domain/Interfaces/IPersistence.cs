@@ -5,7 +5,7 @@ namespace Dsw2026Tpi.Domain.Interfaces;
 
 public interface IPersistence
 {
-    Task<List<T>> pruebas<T>(List<T> entity) where T : EntityBase;    
+    Task<List<T>> AddRange<T>(List<T> entity) where T : EntityBase;    
     Task<T?> GetById<T>(Guid id, params string[] include) where T : EntityBase;
     Task<IEnumerable<T>?> GetAll<T>(params string[] include) where T : EntityBase;
     Task<T?> First<T>(Expression<Func<T, bool>> predicate, params string[] include) where T : EntityBase;

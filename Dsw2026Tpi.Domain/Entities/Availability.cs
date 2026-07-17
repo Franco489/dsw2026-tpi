@@ -14,7 +14,7 @@ namespace Dsw2026Tpi.Domain.Entities
         public Doctor Doctor { get; set; }
         public Guid DoctorId { get; set; }
 
-        public ICollection<AvailabilitySlot> Slots { get; set; } = new List<AvailabilitySlot>();
+        public ICollection<AvailabilitySlot> Slots { get; set; } = [];
 
     }
 }
