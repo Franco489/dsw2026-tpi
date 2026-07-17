@@ -20,17 +20,28 @@ public class DoctorController : AppController
     [HttpGet]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAll([FromQuery]int pageSize, [FromQuery]int pageIndex, [FromQuery]string? name = null)
+    public async Task<IActionResult> GetAll([FromQuery]int pageSize = 10, [FromQuery]int pageIndex = 0, [FromQuery]string? name = null)
     {
         var doctors = await _service.GetAll(pageSize, pageIndex, name);
         return Ok(doctors);
     }
 
     [HttpPost]
+    [AllowAnonymous]
+
     public async Task<IActionResult> CreateDoctor(DoctorModel.Request request)
     {
         await _service.CreateDoctor(request);
         return Created();
+    }
+
+    [HttpGet("{id}/availabilities")]
+    [AllowAnonymous]
+
+    public async Task<IActionResult> GetAvailabilities([FromRoute] Guid id, [FromQuery] int pageSize = 10, [FromQuery] int pageIndex = 0)
+    {
+        var availabilities = await _service.GetAvailabilities(id, pageSize, pageIndex);
+        return Ok(availabilities);
     }
 
     [HttpPut("{id}")]
