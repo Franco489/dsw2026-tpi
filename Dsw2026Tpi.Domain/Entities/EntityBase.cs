@@ -26,5 +26,9 @@ namespace Dsw2026Tpi.Domain.Entities
         {
             Deleted = true;
         }
+        public void Activate()
+        {
+            Deleted = false;
+        }
     }
 }
