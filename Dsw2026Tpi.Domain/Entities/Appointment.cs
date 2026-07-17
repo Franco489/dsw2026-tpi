@@ -6,8 +6,8 @@ namespace Dsw2026Tpi.Domain.Entities
 {
     public class Appointment: EntityBase
     {
-        public DateTime AttendedAt { get; set;}
-        public DateTime CancelledAt { get; set;}
+        public DateTime? AttendedAt { get; set; }
+        public DateTime? CancelledAt { get; set;}
         public AppointmentStatus Status { get; private set; } = AppointmentStatus.BOOKED;
         public string Reason { get; set; } = string.Empty;
         public Patient Patient { get; set; }
