@@ -8,5 +8,6 @@ namespace Dsw2026Tpi.Application.Dtos;
 public record AppointmentModel
 {
     public record request(Guid doctorId, Guid availabilityId, patientAux paciente, string reason);
-    public record patientAux(string dni, int phoneNumber);
+    public record patientAux(string dni);
+
 }

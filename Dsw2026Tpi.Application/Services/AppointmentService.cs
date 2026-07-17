@@ -48,9 +48,11 @@ public class AppointmentService : IAppointmentService
             Patient = paciente,
             PatientId = paciente.Id
         };
-        
 
-        
+        disponibilidad.Status = AvailabilitySlotStatus.BOOKED; // una vez creada la cita, ya bloqueo ese turno que habia disponible
+
+        await _persistence.Add<Appointment>(cita); // guardamo la cita
+        await _persistence.Update<AvailabilitySlot>(disponibilidad); // actualizamos el estado del turno (tecnicamente se hace antes pero se entiende, aqui lo actualizamos en la bd)
     }
 
 

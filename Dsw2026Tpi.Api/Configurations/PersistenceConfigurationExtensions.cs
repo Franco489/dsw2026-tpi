@@ -23,6 +23,7 @@ public static class PersistenceConfigurationExtensions
             {
                 c.Seedwork<Speciality>("specialities");
                 c.Seedwork<Doctor>("doctors");
+                c.Seedwork<Patient>("patients");
             });
         });
 
