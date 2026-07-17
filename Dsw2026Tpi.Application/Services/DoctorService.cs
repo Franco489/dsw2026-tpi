@@ -27,4 +27,18 @@ public class DoctorService : IDoctorService
         return doctors.Map(d => new DoctorModel.Response(d.Id, d.Name, d.LicenseNumber,
             new DoctorModel.SpecialityDto(d.Speciality?.Id, d.Speciality?.Name)));
     }
+    public Task UpdateDoctor(Guid id, DoctorModel.Request request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task DeleteDoctor(Guid id)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task ReactivateDoctor(Guid id)
+    {
+        throw new NotImplementedException();
+    }
 }

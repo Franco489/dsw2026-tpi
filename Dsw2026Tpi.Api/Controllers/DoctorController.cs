@@ -1,4 +1,5 @@
-﻿using Dsw2026Tpi.Application.Interfaces;
+﻿using Dsw2026Tpi.Application.Dtos;
+using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.CrossCutting.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,5 +24,33 @@ public class DoctorController : AppController
     {
         var doctors = await _service.GetAll(pageSize, pageIndex, name);
         return Ok(doctors);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateDoctor(DoctorModel.Request request)
+    {
+        await _service.CreateDoctor(request);
+        return Created();
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateDoctor(Guid id, DoctorModel.Request request)
+    {
+        await _service.UpdateDoctor(id, request);
+        return Ok("Doctor actualizado correctamente");
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteDoctor([FromRoute] Guid id)
+    {
+        await _service.DeleteDoctor(id);
+        return Ok("Doctor eliminado correctamente");
+    }
+
+    [HttpPut("activate")]
+    public async Task<IActionResult> ReactivateDoctor([FromQuery] Guid id)
+    {
+        await _service.ReactivateDoctor(id);
+        return Ok("Doctor reactivado correctamente");
     }
 }
