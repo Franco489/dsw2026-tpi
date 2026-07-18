@@ -21,6 +21,8 @@ public static class PersistenceConfigurationExtensions
             options.UseSqlServer(connectionString);
             options.UseSeeding((c, t) =>
             {
+                c.Database.EnsureDeleted();
+                c.Database.Migrate();
                 c.Seedwork<Speciality>("specialities");
                 c.Seedwork<Doctor>("doctors");
             });

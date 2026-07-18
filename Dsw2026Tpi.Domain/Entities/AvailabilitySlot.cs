@@ -12,6 +12,7 @@ namespace Dsw2026Tpi.Domain.Entities
         public AvailabilitySlotStatus Status { get; set; } = AvailabilitySlotStatus.AVAILABLE;
         public Availability Availability { get; set; }
         public Guid AvailabilityId { get; set; }
+        public Guid DoctorId { get; set; }
 
     }
 }

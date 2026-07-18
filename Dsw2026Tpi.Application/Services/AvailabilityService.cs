@@ -36,46 +36,55 @@ public class AvailabilityService : IAvailabilityService
         foreach (var daySchedule in request.Days)
         {
             var dayOfWeek = daySchedule.Day.toDayOfWeek();
+            if(daySchedule.StartTime >= daySchedule.EndTime) 
+            {
+                throw new ArgumentOutOfRangeException("El horario de inicio debe ser 30 minutos menor al horario de fin.");
+            }
             var avaRule = new Availability
             {
                 DoctorId = doctor.Id,
-                Doctor = doctor,
                 Month = (byte)actualMonth,
                 Year = (short)actualYear,
                 DayOfWeek = (byte)dayOfWeek,
                 StartTime = daySchedule.StartTime,
-                EndTime = daySchedule.EndTime
+                EndTime = daySchedule.EndTime,
+                Slots = []
             };
 
             for (int d = actualDate.Day; d <= numOfDays; d++)
             {
                 var iterationDate = new DateOnly(actualYear, actualMonth, d);
-                var slotStartTime = daySchedule.StartTime;
+
                 if (iterationDate.DayOfWeek == dayOfWeek)
                 {
+                    var slotStartTime = daySchedule.StartTime;
                     while (slotStartTime < daySchedule.EndTime)
                     {
                         var slotEndTime = slotStartTime.AddMinutes(30);
 
-                        if (slotEndTime > daySchedule.EndTime) break;
+                        if (slotEndTime > daySchedule.EndTime)
+                        { 
+                            break; 
+                        }
                         avaRule.Slots.Add(new AvailabilitySlot
                         {
                             Date = iterationDate,
                             StartTime = slotStartTime,
-                            EndTime = slotEndTime
+                            EndTime = slotEndTime,
+                            DoctorId = request.DoctorId
                         });
                         slotStartTime = slotEndTime;
                     }
                 }
-                d += 5; // Nos ahorramos un par de iteraciones saltando a la siguiente semana
+            }
+            if (avaRule.Slots.Any()) 
+            {
                 avaRules.Add(avaRule);
             }
-            await _persistence.AddRange(avaRules); // TODO: <- Optimizar. No sé si esta sea la forma más efectiva. 
-            foreach (var a in avaRules) 
-            {
-                await _persistence.AddRange(a.Slots.ToList());
-            }
-            //TODO: El método funciona parcialmente. A veces registra los slots y a veces no. 
+        }
+        if (avaRules.Any()) 
+        {
+            await _persistence.AddRange(avaRules);
         }
     }
 }
