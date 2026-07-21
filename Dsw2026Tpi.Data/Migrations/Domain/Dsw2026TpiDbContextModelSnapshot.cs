@@ -121,6 +121,9 @@ namespace Dsw2026Tpi.Data.Migrations
                     b.Property<bool>("Deleted")
                         .HasColumnType("bit");
 
+                    b.Property<Guid>("DoctorId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<TimeOnly>("EndTime")
                         .HasColumnType("time");
 

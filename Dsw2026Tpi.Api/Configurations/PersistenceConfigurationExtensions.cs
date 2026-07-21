@@ -21,8 +21,6 @@ public static class PersistenceConfigurationExtensions
             options.UseSqlServer(connectionString);
             options.UseSeeding((c, t) =>
             {
-                c.Database.EnsureDeleted();
-                c.Database.Migrate();
                 c.Seedwork<Speciality>("specialities");
                 c.Seedwork<Doctor>("doctors");
             });
@@ -37,5 +35,15 @@ public static class PersistenceConfigurationExtensions
             });
         });
         return services;
+    }
+    public static WebApplication ResetDbOnStart(this WebApplication app) 
+    {
+        using var scope = app.Services.CreateScope();
+        var provider = scope.ServiceProvider;
+
+        var domainContext = provider.GetRequiredService<Dsw2026TpiDbContext>();
+        domainContext.Database.EnsureDeleted();
+        domainContext.Database.Migrate();
+        return app;
     }
 }
