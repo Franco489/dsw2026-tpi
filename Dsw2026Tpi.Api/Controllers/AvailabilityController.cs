@@ -24,5 +24,13 @@ public class AvailabilityController : AppController
     }
 
 
+    [HttpPut]
+    public async Task<IActionResult> UpdateAvailability([FromBody] AvailabilityModel.Request request)
+    {
+        await _service.UpdateAvailability(request);
+        return Ok(request);
+    }
+
+
 
 }

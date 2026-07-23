@@ -72,13 +72,13 @@ public class AvailabilityService : IAvailabilityService
                     //Mientras la hora de inicio del turno del paciente sea menor a la hora de fin del turno del doctor, se crean los slots de disponibilidad
                     while (horaInicioTurno < scheduleDto.endTime)
                     {
-                        //Se calcula la hora de fin del turno en base a la hora de inicio
                         var horaFinTurno = horaInicioTurno.AddMinutes(30);
 
                         //Si el turno termina después de la hora de fin del turno del doctor, se rompe el ciclo
                         if (horaFinTurno > scheduleDto.endTime) break;
 
-                        //Se crea un slot de disponibilidad con la fecha de la iteración, hora de inicio y hora de fin del turno de 30 minutos
+                            //Se calcula la hora de fin del turno en base a la hora de inicio
+                    //Se crea un slot de disponibilidad con la fecha de la iteración, hora de inicio y hora de fin del turno de 30 minutos
                         regla.Slots.Add(new AvailabilitySlot
                         {
                             Date = fechaIteracion,
@@ -103,7 +103,7 @@ public class AvailabilityService : IAvailabilityService
                 nuevasReglas.Add(regla);
             }
         }
-       await _persistence.pruebas(nuevasReglas);
+       await _persistence.AddRange(nuevasReglas);
 
     }
 
@@ -123,5 +123,76 @@ public class AvailabilityService : IAvailabilityService
         };
     }
 
+
+
+      
+    public async Task UpdateAvailability (AvailabilityModel.Request request)
+    {
+        var doctor = await _persistence.GetById<Doctor>(request.DoctorId);
+        if (doctor == null)
+        {
+            throw new ArgumentException($"No se encontró un doctor con el ID {request.DoctorId}");
+        }
+
+        var hoy = DateOnly.FromDateTime(DateTime.Now);
+        var mesActual = hoy.Month;
+        var anioActual = hoy.Year;
+
+        var diasEnElMes = DateTime.DaysInMonth(anioActual, mesActual);
+
+        var nuevasReglas = new List<Availability>();
+
+        foreach (var scheduleDto in request.Days)
+        {
+            var diaCsharp = TraducirDia(scheduleDto.day);
+
+            var regla = new Availability
+            {
+                DoctorId = request.DoctorId,
+                Month = (byte)mesActual,
+                Year = (short)anioActual,
+                DayOfWeek = (byte)diaCsharp,
+                StartTime = scheduleDto.startTime,
+                EndTime = scheduleDto.endTime,
+
+                Slots = new List<AvailabilitySlot>()
+            };
+
+            for (int dia = hoy.Day; dia <= diasEnElMes; dia++)
+            {
+                var fechaIteracion = new DateOnly(anioActual, mesActual, dia);
+
+                if (fechaIteracion.DayOfWeek == diaCsharp)
+                {
+                    var horaInicioTurno = scheduleDto.startTime;
+
+                    while (horaInicioTurno < scheduleDto.endTime)
+                    {
+                        var horaFinTurno = horaInicioTurno.AddMinutes(30);
+
+                        if (horaFinTurno > scheduleDto.endTime) break;
+                      
+                        regla.Slots.Add(new AvailabilitySlot
+                        {
+                            Date = fechaIteracion,
+                            StartTime = horaInicioTurno,
+                            EndTime = horaFinTurno
+
+                        });
+
+                        horaInicioTurno = horaFinTurno;
+                    }
+                }
+            }
+
+            if (regla.Slots.Any())
+            {
+                nuevasReglas.Add(regla);
+            }
+        }
+        await _persistence.UpdateRange<Availability>(nuevasReglas);
+
+
+    }
 
 }
