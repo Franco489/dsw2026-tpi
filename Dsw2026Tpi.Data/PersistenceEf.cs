@@ -63,6 +63,18 @@ public class PersistenceEf: IPersistence
         await _context.SaveChangesAsync();
         return entity;
     }
+    public async Task<List<T>> UpdateRange<T>(List<T> entities) where T : EntityBase
+    {
+        foreach (var entity in entities) 
+        {
+            if (_context.Entry(entity).State == EntityState.Detached) 
+            {
+                _context.Update(entity);
+            }
+        }       
+        await _context.SaveChangesAsync();
+        return entities;
+    }
 
     public async Task<Pagination<T>> Paginate<T, TKey>(int pageSize, int pageIndex, Expression<Func<T, bool>> predicate, Expression<Func<T, TKey>> sortOrder, params string[] includes) where T : EntityBase
     {

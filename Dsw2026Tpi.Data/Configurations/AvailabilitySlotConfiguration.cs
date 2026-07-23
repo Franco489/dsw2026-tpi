@@ -15,7 +15,7 @@ namespace Dsw2026Tpi.Data.Configuration
             builder.ToTable("AvailabilitySlots");
             builder.HasIndex(a => new
             {
-                // a.Availability.DoctorId,
+                a.DoctorId,
                 a.Date,
                 a.StartTime
             });

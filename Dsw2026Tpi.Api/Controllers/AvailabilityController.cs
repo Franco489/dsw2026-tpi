@@ -22,7 +22,11 @@ public class AvailabilityController : AppController
         await _service.CreateAvailabilitiesAsync(request);
         return Ok(request);
     }
-
-
+    [HttpPut]
+    public async Task<IActionResult> UpdateAvailability([FromBody] AvailabilityModel.Request request)
+    {
+        await _service.UpdateAvailabilitiesAsync(request);
+        return Ok(request);
+    }
 
 }
