@@ -105,7 +105,7 @@ public class AvailabilityService : IAvailabilityService
     public async Task UpdateAvailabilitiesAsync(AvailabilityModel.Request request)
     {
         var availabilities = await _persistence.GetFiltered<Availability>((a => a.DoctorId == request.DoctorId), nameof(Availability.Slots));
-        List<Availability> updatedRules = [];
+        //List<Availability> updatedRules = [];
         if (!availabilities.Any()) 
         {
             throw new EntityNotFoundException($"No se encontraron disponibilidades asociadas a la ID {request.DoctorId}. Revise la ID ingresada o intente crear una nueva disponibilidad");
@@ -125,18 +125,18 @@ public class AvailabilityService : IAvailabilityService
                     rule.StartTime = daySchedule.StartTime;
                     rule.EndTime = daySchedule.EndTime;
                     rule.Slots.Clear();//el clear entiendo que sirve para la trazabilidad. Así EF entiende que primero se borró (por ende borra los registros) y después se agregaron los nuevos.
-                    //TODO: Directamente los regeneramos, creo que es un bardo hacer lógica para modificar los slots exxistentes.
+                    //TODO: Directamente los regeneramos, creo que es un bardo hacer lógica para modificar los slots existentes.
                     foreach(var slot in GenerateSlots(request.DoctorId, daySchedule.StartTime, daySchedule.EndTime, dayOfWeek))
                     {
                         rule.Slots.Add(slot);
                     }
-                    updatedRules.Add(rule);
+                    //updatedRules.Add(rule);
                 }
             } 
         }
-        if (updatedRules.Any()) 
+        if (availabilities.Any()) 
         {
-            await _persistence.UpdateRange(updatedRules);
+            await _persistence.UpdateRange(availabilities.ToList());
         }
     }
 }

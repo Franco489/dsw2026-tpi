@@ -12,7 +12,8 @@ namespace Dsw2026Tpi.Domain.Entities
         public bool Deleted { get; set; } = false;
         protected EntityBase(Guid? id = null)
         {
-            Id = id ?? Guid.NewGuid();
+            //TODO: Esto no recuerdo si venía en la plantilla del profe o lo copiamos de la nuestra. Resulta que esto genera conlfictos con EF en ciertos casos.
+            //Id = id ?? Guid.NewGuid(); 
         }
 
         public void UpdateEntity(DateTime updateDate)
