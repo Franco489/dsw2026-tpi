@@ -21,14 +21,6 @@ public class PersistenceEf: IPersistence
         await _context.SaveChangesAsync();
         return entity;
     } 
-
-    public async Task<List<T>> UpdateRange<T>(List<T> entity) where T : EntityBase
-    {
-        _context.UpdateRange(entity);
-        await _context.SaveChangesAsync();
-        return entity;
-    }
-
     public async Task<T> Add<T>(T entity) where T : EntityBase  
     {
         await _context.AddAsync(entity);
@@ -69,6 +61,18 @@ public class PersistenceEf: IPersistence
         _context.Update(entity);
         await _context.SaveChangesAsync();
         return entity;
+    }
+    public async Task<List<T>> UpdateRange<T>(List<T> entities) where T : EntityBase
+    {
+        foreach (var entity in entities) 
+        {
+            if (_context.Entry(entity).State == EntityState.Detached) 
+            {
+                _context.Update(entity);
+            }
+        }       
+        await _context.SaveChangesAsync();
+        return entities;
     }
 
     public async Task<Pagination<T>> Paginate<T, TKey>(int pageSize, int pageIndex, Expression<Func<T, bool>> predicate, Expression<Func<T, TKey>> sortOrder, params string[] includes) where T : EntityBase

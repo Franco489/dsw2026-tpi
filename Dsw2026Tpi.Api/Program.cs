@@ -44,6 +44,10 @@ public class Program
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+                if (app.Configuration.GetValue<bool>("ResetBdOnStart")) 
+                {
+                    app.ResetDbOnStart();//TODO: Borrar cuando se acaben las pruebas.
+                } 
             }
 
             app.UseAuthentication();

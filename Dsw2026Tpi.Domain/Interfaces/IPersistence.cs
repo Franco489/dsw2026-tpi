@@ -12,8 +12,8 @@ public interface IPersistence
     Task<IEnumerable<T>?> GetFiltered<T>(Expression<Func<T, bool>> predicate, params string[] include) where T : EntityBase;
     Task<T> Add<T>(T entity) where T : EntityBase;
     Task<T> Update<T>(T entity) where T : EntityBase;
+    Task<List<T>> UpdateRange<T>(List<T> entities) where T : EntityBase;
     Task<T> Delete<T>(T entity) where T : EntityBase;
     Task<Pagination<T>> Paginate<T, TKey>(int pageSize, int pageIndex, Expression<Func<T, bool>> predicate, Expression<Func<T, TKey>> sortOrder, params string[] includes) where T : EntityBase;
-    Task<List<T>> UpdateRange<T>(List<T> entity) where T : EntityBase;
 
 }

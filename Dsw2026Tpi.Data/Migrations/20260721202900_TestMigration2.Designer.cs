@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dsw2026Tpi.Data.Migrations
 {
     [DbContext(typeof(Dsw2026TpiDbContext))]
-    [Migration("20260716154738_migracion39")]
-    partial class migracion39
+    [Migration("20260721202900_TestMigration2")]
+    partial class TestMigration2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -124,6 +124,9 @@ namespace Dsw2026Tpi.Data.Migrations
                     b.Property<bool>("Deleted")
                         .HasColumnType("bit");
 
+                    b.Property<Guid>("DoctorId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<TimeOnly>("EndTime")
                         .HasColumnType("time");
 
@@ -141,7 +144,7 @@ namespace Dsw2026Tpi.Data.Migrations
 
                     b.HasIndex("AvailabilityId");
 
-                    b.HasIndex("Date", "StartTime");
+                    b.HasIndex("DoctorId", "Date", "StartTime");
 
                     b.ToTable("AvailabilitySlots", (string)null);
                 });
