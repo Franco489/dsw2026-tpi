@@ -37,4 +37,14 @@ public static class PersistenceConfigurationExtensions
         });
         return services;
     }
+    public static WebApplication ResetDbOnStart(this WebApplication app) 
+    {
+        using var scope = app.Services.CreateScope();
+        var provider = scope.ServiceProvider;
+
+        var domainContext = provider.GetRequiredService<Dsw2026TpiDbContext>();
+        domainContext.Database.EnsureDeleted();
+        domainContext.Database.Migrate();
+        return app;
+    }
 }

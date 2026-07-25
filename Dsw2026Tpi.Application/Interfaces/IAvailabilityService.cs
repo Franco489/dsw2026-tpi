@@ -8,4 +8,5 @@ namespace Dsw2026Tpi.Application.Interfaces;
 public interface IAvailabilityService
 {
     Task CreateAvailabilitiesAsync(AvailabilityModel.Request request);
+    Task UpdateAvailabilitiesAsync(AvailabilityModel.Request request);
 }

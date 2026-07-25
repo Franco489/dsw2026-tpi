@@ -15,10 +15,10 @@ namespace Dsw2026Tpi.Data.Configuration
             builder.ToTable("AvailabilitySlots");
             builder.HasIndex(a => new
             {
-                // a.Availability.DoctorId,
+                a.DoctorId,
                 a.Date,
                 a.StartTime
-            });
+            }).IsUnique();
             builder.Property(a => a.Date).IsRequired();
             builder.Property(a => a.StartTime).IsRequired();
             builder.Property(a => a.EndTime).IsRequired();

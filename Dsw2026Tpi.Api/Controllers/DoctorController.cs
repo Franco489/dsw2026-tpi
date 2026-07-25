@@ -18,7 +18,7 @@ public class DoctorController : AppController
     }
 
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK)] //TODO: Esto no hace falta, verda?
     public async Task<IActionResult> GetAll([FromQuery]int pageSize = 10, [FromQuery]int pageIndex = 0, [FromQuery]string? name = null)
     {
         var doctors = await _service.GetAll(pageSize, pageIndex, name);
