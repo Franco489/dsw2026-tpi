@@ -117,8 +117,8 @@ public class AvailabilityService : IAvailabilityService
                 var dayOfWeek = daySchedule.Day.toDayOfWeek();
                 if (rule.DayOfWeek == (byte)dayOfWeek)
                 {
-                    var bookedSlots = rule.Slots.Where(s => s.Status != AvailabilitySlotStatus.AVAILABLE);
-                    if (bookedSlots.Count() > 0)
+                    //var bookedSlots = rule.Slots.Where(s => s.Status != AvailabilitySlotStatus.AVAILABLE); La línea de abajo es más eficiente respecto a la versión anterior. Es mejor un Any() que un Count() en este caso.
+                    if (rule.Slots.Any(s => s.Status != AvailabilitySlotStatus.AVAILABLE))
                     {
                         throw new InvalidOperationException("Existen turnos reservados/bloqueados para la disponiblidad actual. No es posible modificar los horarios asignados"); //TODO: Mejorar el manejo de este caso
                     }
