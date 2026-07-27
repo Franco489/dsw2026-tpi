@@ -21,6 +21,51 @@ public class AppointmentController : AppController
         await _service.CreateAppointment(request);
         return Ok("Turno creado correctamente");
     }
+    //ver los turnos del paciente
+    [HttpGet("patient")]
+    public async Task<IActionResult> GetPatientAppointments([FromQuery] int dni)
+    {
+        if (dni <= 0 || dni.ToString().Length < 7 || dni.ToString().Length > 10)
+        {
+            return BadRequest(new
+            {
+                errorCode = "INVALID_DNI",
+                message = "El DNI es obligatorio y debe tener entre 7 y 10 dígitos."
+            });
+        }
 
+        var result = await _service.GetPatientAppointmentsAsync(dni);
+        return Ok(result);
+    }
 
+    // cancelar el turno
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> CancelAppointment([FromRoute] Guid id)
+    {
+        try
+        {
+            await _service.CancelAppointmentAsync(id);
+            return Ok("Turno cancelado correctamente");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new
+            {
+                errorCode = "APPOINTMENT_CANCEL_ERROR",
+                message = ex.Message
+            });
+        }
+    }
+
+    // busqueda de turnos
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchAppointments(
+        [FromQuery] Guid? specialtyId,
+        [FromQuery] Guid? doctorId,
+        [FromQuery] string? dni,
+        [FromQuery] DateTime? date)
+    {
+        var result = await _service.SearchAppointmentsAsync(specialtyId, doctorId, dni, date);
+        return Ok(result);
+    }
 }
