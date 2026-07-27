@@ -23,17 +23,14 @@ public class AvailabilityService : IAvailabilityService
         _persistence = persistence;
     }
 
-    private List<AvailabilitySlot> GenerateSlots(Guid doctorId,TimeOnly startTime, TimeOnly endTime, DayOfWeek dayOfWeek) 
+    private List<AvailabilitySlot> GenerateSlots(Guid doctorId,TimeOnly startTime, 
+        TimeOnly endTime, DayOfWeek dayOfWeek, DateOnly actualDate, int numOfDays) 
     {
-        var actualDate = DateOnly.FromDateTime(DateTime.Now);
-        var actualMonth = actualDate.Month;
-        var actualYear = actualDate.Year;
-        var numOfDays = DateTime.DaysInMonth(actualYear, actualMonth);
         ICollection<AvailabilitySlot> slots = [];
 
         for (int d = actualDate.Day; d <= numOfDays; d++)
         {
-            var iterationDate = new DateOnly(actualYear, actualMonth, d);
+            var iterationDate = new DateOnly(actualDate.Year, actualDate.Month,d);
 
             if (iterationDate.DayOfWeek == dayOfWeek)
             {
@@ -67,31 +64,30 @@ public class AvailabilityService : IAvailabilityService
             throw new EntityNotFoundException($"No se encontró un doctor con el ID {request.DoctorId}");
         }
         var actualDate = DateOnly.FromDateTime(DateTime.Now);
-        var actualMonth = actualDate.Month;
-        var actualYear = actualDate.Year;
-        var numOfDays = DateTime.DaysInMonth(actualYear, actualMonth);
+        var numOfDays = DateTime.DaysInMonth(actualDate.Year, actualDate.Month);
 
         var avaRules = new List<Availability>();
 
         foreach (var daySchedule in request.Days)
         {
-            var dayOfWeek = daySchedule.Day.toDayOfWeek();
             if (daySchedule.EndTime < daySchedule.StartTime.AddMinutes(30))
             {
                 throw new ArgumentOutOfRangeException("El horario de inicio debe ser 30 minutos menor al horario de fin.");
-            }
+            }//TODO: llevar esta validación a un hhelper.
+            var dayOfWeek = daySchedule.Day.toDayOfWeek();
             var avaRule = new Availability
             {
                 DoctorId = doctor.Id,
-                Month = (byte)actualMonth,
-                Year = (short)actualYear,
+                Month = (byte)actualDate.Month,
+                Year = (short)actualDate.Year,
                 DayOfWeek = (byte)dayOfWeek,
                 StartTime = daySchedule.StartTime,
                 EndTime = daySchedule.EndTime,
                 Slots = []
             };
 
-            avaRule.Slots = GenerateSlots(request.DoctorId, daySchedule.StartTime, daySchedule.EndTime, dayOfWeek);
+            avaRule.Slots = GenerateSlots(request.DoctorId, daySchedule.StartTime, 
+                daySchedule.EndTime, dayOfWeek, actualDate, numOfDays);
             if (avaRule.Slots.Any())
             {
                 avaRules.Add(avaRule);
@@ -105,32 +101,34 @@ public class AvailabilityService : IAvailabilityService
     public async Task UpdateAvailabilitiesAsync(AvailabilityModel.Request request)
     {
         var availabilities = await _persistence.GetFiltered<Availability>((a => a.DoctorId == request.DoctorId), nameof(Availability.Slots));
-        //List<Availability> updatedRules = [];
         if (!availabilities.Any()) 
         {
             throw new EntityNotFoundException($"No se encontraron disponibilidades asociadas a la ID {request.DoctorId}. Revise la ID ingresada o intente crear una nueva disponibilidad");
         }
+        var actualDate = DateOnly.FromDateTime(DateTime.Now);
+        var numOfDays = DateTime.DaysInMonth(actualDate.Year, actualDate.Month);
         foreach (var rule in availabilities) 
         {
             foreach (var daySchedule in request.Days)
             {
+                if (daySchedule.EndTime < daySchedule.StartTime.AddMinutes(30))
+                {
+                    throw new ArgumentOutOfRangeException("El horario de inicio debe ser 30 minutos menor al horario de fin.");
+                }
                 var dayOfWeek = daySchedule.Day.toDayOfWeek();
                 if (rule.DayOfWeek == (byte)dayOfWeek)
                 {
-                    //var bookedSlots = rule.Slots.Where(s => s.Status != AvailabilitySlotStatus.AVAILABLE); La línea de abajo es más eficiente respecto a la versión anterior. Es mejor un Any() que un Count() en este caso.
                     if (rule.Slots.Any(s => s.Status != AvailabilitySlotStatus.AVAILABLE))
                     {
                         throw new InvalidOperationException("Existen turnos reservados/bloqueados para la disponiblidad actual. No es posible modificar los horarios asignados"); //TODO: Mejorar el manejo de este caso
                     }
                     rule.StartTime = daySchedule.StartTime;
                     rule.EndTime = daySchedule.EndTime;
-                    rule.Slots.Clear();//el clear entiendo que sirve para la trazabilidad. Así EF entiende que primero se borró (por ende borra los registros) y después se agregaron los nuevos.
-                    //TODO: Directamente los regeneramos, creo que es un bardo hacer lógica para modificar los slots existentes.
-                    foreach(var slot in GenerateSlots(request.DoctorId, daySchedule.StartTime, daySchedule.EndTime, dayOfWeek))
+                    rule.Slots.Clear();
+                    foreach(var slot in GenerateSlots(request.DoctorId, daySchedule.StartTime, daySchedule.EndTime, dayOfWeek, actualDate, numOfDays))
                     {
                         rule.Slots.Add(slot);
                     }
-                    //updatedRules.Add(rule);
                 }
             } 
         }
