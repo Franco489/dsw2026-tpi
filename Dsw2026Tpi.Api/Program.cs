@@ -47,6 +47,7 @@ public class Program
                 if (app.Configuration.GetValue<bool>("ResetBdOnStart")) 
                 {
                     app.ResetDbOnStart();//TODO: Borrar cuando se acaben las pruebas.
+                    await app.SeedAdminAsync();
                 } 
             }
 
