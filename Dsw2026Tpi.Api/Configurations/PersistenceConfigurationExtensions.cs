@@ -28,10 +28,11 @@ public static class PersistenceConfigurationExtensions
 
         services.AddDbContext<AuthenticationDbContext>(options =>
         {
-            options.UseSqlServer(connectionString);
+            options.UseSqlServer(connectionString, 
+                config => config.MigrationsHistoryTable("__EFMigrationsHistory_Auth"));
             options.UseSeeding((c, t) =>
             {
-                c.Seedwork<IdentityRole>("Sources\\roles.json");
+                c.Seedwork<IdentityRole>("roles");
             });
         });
         return services;
@@ -42,8 +43,10 @@ public static class PersistenceConfigurationExtensions
         var provider = scope.ServiceProvider;
 
         var domainContext = provider.GetRequiredService<Dsw2026TpiDbContext>();
+        var authContext = provider.GetRequiredService<AuthenticationDbContext>();
         domainContext.Database.EnsureDeleted();
         domainContext.Database.Migrate();
+        authContext.Database.Migrate();
         return app;
     }
 }
