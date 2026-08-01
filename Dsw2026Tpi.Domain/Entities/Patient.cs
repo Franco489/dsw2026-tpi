@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+
+
 namespace Dsw2026Tpi.Domain.Entities
 {
     public class Patient: EntityBase
@@ -10,5 +12,8 @@ namespace Dsw2026Tpi.Domain.Entities
         public string Name { get; set; } = string.Empty;
         public string PhoneNumber {  get; set; } = string.Empty;
         public string Email { get; set; }
+        public Guid UserId { get; set; }
+
+        public ApplicationUser? User { get; set; }
     }
 }
