@@ -1,5 +1,6 @@
 ﻿using Dsw2026Tpi.Application.Dtos;
 using Dsw2026Tpi.Application.Interfaces;
+using Dsw2026Tpi.CrossCutting.Exceptions;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
 using System;
@@ -17,52 +18,51 @@ public class AppointmentService : IAppointmentService
         _persistence = persistence;
     }
 
-    public async Task CreateAppointment(AppointmentModel.request request)
+    public async Task CreateAppointment(AppointmentModel.Request request)
     {
-        var doctor = await _persistence.GetById<Doctor>(request.doctorId);
+        var doctor = await _persistence.GetById<Doctor>(request.DoctorId);
         if (doctor == null)
         {
-            throw new Exception("No existe el Doctor");
+            throw new EntityNotFoundException($"No existe el Doctor con ID {request.DoctorId}");
         }
 
-        var pacientes = await _persistence.GetAll<Patient>(); // No se puede filtrar aqui directamente porq es lazy
-        var paciente = pacientes.SingleOrDefault(d => d.Dni == request.paciente.dni);
-
-        if (paciente == null)
+        var availabilitySlot = await _persistence.First<AvailabilitySlot>(s => s.Id == request.AvailabilitySlotId 
+        && s.Availability.DoctorId == request.DoctorId);
+        if (availabilitySlot == null)
         {
-            throw new Exception("No existe el Paciente");
+            throw new EntityNotFoundException($"No se encontró el slot de disponibilidad {request.AvailabilitySlotId} asociado a {request.DoctorId}"); 
+        }
+        else if (availabilitySlot.Status == AvailabilitySlotStatus.BOOKED) 
+        {
+            throw new BusinessRuleException("El turno ya se encuentra reservado", "RESOLVER ESTE PARAMETRO");//TODO: ver que retornar acá
         }
 
-        var disponibilidad = await _persistence.GetById<AvailabilitySlot>(request.availabilityId);
-        if (disponibilidad == null || disponibilidad.Status == AvailabilitySlotStatus.BOOKED)
+        var patient = await _persistence.First<Patient>(p => p.Dni == request.Patient.Dni);
+
+        if (patient == null)
         {
-            throw new Exception("No disponible o Turno ya ocupado"); // Esto en realidad son 2 validaciones distintas
+            throw new EntityNotFoundException($"No existe el Paciente con DNI {request.Patient.Dni}");
         }
 
-        var cita = new Appointment
+        await _persistence.Add(new Appointment 
         {
-            AttendedAt = null,
-            CancelledAt = null,
-            Reason = request.reason,
-            Patient = paciente,
-            PatientId = paciente.Id
-        };
-
-        disponibilidad.Status = AvailabilitySlotStatus.BOOKED; // una vez creada la cita, ya bloqueo ese turno que habia disponible
-
-        await _persistence.Add<Appointment>(cita); // guardamos la cita
-        await _persistence.Update<AvailabilitySlot>(disponibilidad); // actualizamos el estado del turno (tecnicamente se hace antes pero se entiende, aqui lo actualizamos en la bd)
+            Reason = request.Reason,
+            Patient = patient,
+            PatientId = patient.Id
+        });
+        availabilitySlot.Book();
+        //await _persistence.Update<AvailabilitySlot>(disponibilidad); // actualizamos el estado del turno (tecnicamente se hace antes pero se entiende, aqui lo actualizamos en la bd)
     }
 
     //ver turnos activos del paciente
-    public async Task<IEnumerable<AppointmentModel.patientResponse>> GetPatientAppointmentsAsync(int dni)
+    public async Task<IEnumerable<AppointmentModel.PatientResponse>> GetPatientAppointmentsAsync(int dni)
     {
         var appointments = await _persistence.GetAll<Appointment>();
         var dniString = dni.ToString();
 
         return appointments
             .Where(a => a.Patient != null && a.Patient.Dni == dniString && a.CancelledAt == null)
-            .Select(a => new AppointmentModel.patientResponse(
+            .Select(a => new AppointmentModel.PatientResponse(
                 a.Id,
                 Guid.Empty,
                 string.Empty,
@@ -93,7 +93,7 @@ public class AppointmentService : IAppointmentService
     }
 
     //búsqueda avanzada de turnos (Admin)
-    public async Task<IEnumerable<AppointmentModel.searchResponse>> SearchAppointmentsAsync(Guid? specialtyId, Guid? doctorId, string? dni, DateTime? date)
+    public async Task<IEnumerable<AppointmentModel.SearchResponse>> SearchAppointmentsAsync(Guid? specialtyId, Guid? doctorId, string? dni, DateTime? date)
     {
         var appointments = await _persistence.GetAll<Appointment>();
         var query = appointments.AsQueryable();
@@ -103,7 +103,7 @@ public class AppointmentService : IAppointmentService
             query = query.Where(a => a.Patient != null && a.Patient.Dni == dni);
         }
 
-        return query.Select(a => new AppointmentModel.searchResponse(
+        return query.Select(a => new AppointmentModel.SearchResponse(
             a.Id,
             string.Empty,
             string.Empty,

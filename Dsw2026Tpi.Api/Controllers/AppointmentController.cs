@@ -16,7 +16,7 @@ public class AppointmentController : AppController
     }
 
    [HttpPost]
-   public async Task<IActionResult> createAppointment([FromBody] AppointmentModel.request request)
+   public async Task<IActionResult> createAppointment([FromBody] AppointmentModel.Request request)
     {
         await _service.CreateAppointment(request);
         return Ok("Turno creado correctamente");

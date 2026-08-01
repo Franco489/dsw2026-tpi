@@ -26,27 +26,27 @@ public class AvailabilityService : IAvailabilityService
 
     #region Lógica de Feriados
 
-    private List<HolidayDto> GetHolidays()
-    {
-        var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "holidays.json");
+    //private List<HolidayDto> GetHolidays()
+    //{
+    //    var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "holidays.json");
 
-        if (!File.Exists(filePath))
-            return new List<HolidayDto>();
+    //    if (!File.Exists(filePath))
+    //        return new List<HolidayDto>();
 
-        var json = File.ReadAllText(filePath);
-        return JsonSerializer.Deserialize<List<HolidayDto>>(json, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        }) ?? new List<HolidayDto>();
-    }
+    //    var json = File.ReadAllText(filePath);
+    //    return JsonSerializer.Deserialize<List<HolidayDto>>(json, new JsonSerializerOptions
+    //    {
+    //        PropertyNameCaseInsensitive = true
+    //    }) ?? new List<HolidayDto>();
+    //}
 
-    private bool IsHoliday(DateOnly date)
-    {
-        var holidays = GetHolidays();
-        // convierto el DateOnly a DateTime para comparar con el json
-        var dateTime = date.ToDateTime(TimeOnly.MinValue);
-        return holidays.Any(h => h.Date.Date == dateTime.Date);
-    }
+    //private bool IsHoliday(DateOnly date)
+    //{
+    //    var holidays = GetHolidays();
+    //    // convierto el DateOnly a DateTime para comparar con el json
+    //    var dateTime = date.ToDateTime(TimeOnly.MinValue);
+    //    return holidays.Any(h => h.Date.Date == dateTime.Date);
+    //}
 
     #endregion
 
@@ -63,10 +63,10 @@ public class AvailabilityService : IAvailabilityService
             var iterationDate = new DateOnly(actualYear, actualMonth, d);
 
             // SI EL DÍA ES FERIADO, NO SE GENERAN SLOTS PARA ESTE DÍA
-            if (IsHoliday(iterationDate))
-            {
-                continue;
-            }
+            //if (IsHoliday(iterationDate))
+            //{
+            //    continue;
+            //}
 
             if (iterationDate.DayOfWeek == dayOfWeek)
             {
