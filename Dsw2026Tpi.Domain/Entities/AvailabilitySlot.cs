@@ -18,7 +18,7 @@ namespace Dsw2026Tpi.Domain.Entities
         {
             if (Status == AvailabilitySlotStatus.BOOKED)
             {
-                throw new InvalidOperationException("El turno ya se encuentra reservado.");
+                throw new InvalidOperationException("El turno ya se encuentra reservado.");//TODO:Ver que execpcion va
             }
             Status = AvailabilitySlotStatus.BOOKED;
         }

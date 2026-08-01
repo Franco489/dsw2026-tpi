@@ -50,8 +50,7 @@ public class AppointmentService : IAppointmentService
             Patient = patient,
             PatientId = patient.Id
         });
-        availabilitySlot.Book();
-        //await _persistence.Update<AvailabilitySlot>(disponibilidad); // actualizamos el estado del turno (tecnicamente se hace antes pero se entiende, aqui lo actualizamos en la bd)
+        
     }
 
     //ver turnos activos del paciente
