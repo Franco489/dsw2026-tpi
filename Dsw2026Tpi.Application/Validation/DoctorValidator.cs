@@ -16,18 +16,18 @@ public class DoctorValidator
 
         if (string.IsNullOrWhiteSpace(request.Name))
         {
-            errores.Add( ("El nombre no puede ser nulo o vacío.","VALIDATION_ERROR") );
+            errores.Add( ("Name","El nombre no puede ser nulo o vacío.") );
         }
         
         if (request.SpecialityId == Guid.Empty)
         {
-            errores.Add( ("El ID de la especialidad no puede estar vacío.", "VALIDATION_ERROR") );
+            errores.Add( ("SpecialityId","El ID de la especialidad no puede estar vacío.") );
 
         }
 
         if(request.Name.Length > 100 || request.Name.Length <3)
         {
-            errores.Add( ("El nombre no puede tener más de 100 caracteres.", "VALIDATION_ERROR") );
+            errores.Add( ("Name" ,"La longitud del nombre debe estar entre 3 y 100 caracteres") );
         }
 
         if(errores.Any())
