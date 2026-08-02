@@ -22,7 +22,6 @@ public class DoctorValidator
         if (request.SpecialityId == Guid.Empty)
         {
             errores.Add( ("SpecialityId","El ID de la especialidad no puede estar vacío.") );
-
         }
 
         if(request.Name.Length > 100 || request.Name.Length <3)

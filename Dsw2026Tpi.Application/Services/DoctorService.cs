@@ -29,6 +29,21 @@ public class DoctorService : IDoctorService
         await _persistence.Add(doctor);
     }
 
+    public async Task<Pagination<AvailabilityModel.DaySchedule>> GetAvailabilities(Guid id, int pageSize, int pageIndex)
+    {
+        var doctor = await _persistence.GetById<Doctor>(id);
+        if (doctor == null)
+        {
+            throw new EntityNotFoundException(nameof(Doctor));
+        }
+
+        var slots = await _persistence.Paginate<AvailabilitySlot, DateOnly>(pageSize, pageIndex,
+                                                                   s => s.Availability.DoctorId == id, s => s.Date);
+        return slots.Map(s => new AvailabilityModel.DaySchedule(s.Date.ToString("dd/MM/yyyy"), s.EndTime, s.StartTime));
+
+
+    }
+
     public async Task<Pagination<DoctorModel.Response>> GetAll(int pageSize, int pageIndex, string? name = null)
     {
         var doctors = await _persistence.Paginate<Doctor, string>(pageSize, pageIndex, d => string.IsNullOrWhiteSpace(name) && !d.Deleted ||
@@ -37,11 +52,10 @@ public class DoctorService : IDoctorService
         return doctors.Map(d => new DoctorModel.Response(d.Id, d.Name, d.LicenseNumber,
             new DoctorModel.SpecialityDto(d.Speciality?.Id, d.Speciality?.Name)));
     }
-
     public async Task UpdateDoctor(Guid id, DoctorModel.Request request)
     {
         var speciality = await _persistence.GetById<Speciality>(request.SpecialityId);
-        if(speciality == null)
+        if (speciality == null)
         {
             throw new EntityNotFoundException(nameof(Speciality));
         }

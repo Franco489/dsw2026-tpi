@@ -1,5 +1,5 @@
-﻿using Dsw2026Tpi.Application.Interfaces;
-using Dsw2026Tpi.Application.Dtos;
+﻿using Dsw2026Tpi.Application.Dtos;
+using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.CrossCutting.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,18 +18,28 @@ public class DoctorController : AppController
     }
 
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK)] //TODO: Esto no hace falta, verda?
     public async Task<IActionResult> GetAll([FromQuery]int pageSize = 10, [FromQuery]int pageIndex = 0, [FromQuery]string? name = null)
     {
         var doctors = await _service.GetAll(pageSize, pageIndex, name);
         return Ok(doctors);
     }
 
-    [HttpPost]  
+    [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> CreateDoctor(DoctorModel.Request request)
     {
         await _service.CreateDoctor(request);
         return Created();
+    }
+
+    [HttpGet("{id}/availabilities")]
+    [AllowAnonymous]
+
+    public async Task<IActionResult> GetAvailabilities([FromRoute] Guid id, [FromQuery] int pageSize = 10, [FromQuery] int pageIndex = 0)
+    {
+        var availabilities = await _service.GetAvailabilities(id, pageSize, pageIndex);
+        return Ok(availabilities);
     }
 
     [HttpPut("{id}")]
@@ -40,7 +50,7 @@ public class DoctorController : AppController
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteDoctor([FromRoute]Guid id)
+    public async Task<IActionResult> DeleteDoctor([FromRoute] Guid id)
     {
         await _service.DeleteDoctor(id);
         return Ok("ok");
@@ -52,5 +62,4 @@ public class DoctorController : AppController
         await _service.ReactivateDoctor(id);
         return Ok("Doctor reactivado correctamente");
     }
-
 }

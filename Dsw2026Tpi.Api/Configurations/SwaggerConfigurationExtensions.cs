@@ -1,4 +1,5 @@
 ﻿using Microsoft.OpenApi;
+using System.Text.Json.Nodes;
 
 namespace Dsw2026Tpi.Api.Configurations;
 
@@ -34,6 +35,12 @@ public static class SwaggerConfigurationExtensions
 
             // Configura nombres únicos para schemas con tipos anidados
             o.CustomSchemaIds(type => type.FullName?.Replace("+", "."));
+            o.MapType<TimeOnly>(() => new OpenApiSchema
+            {
+                
+                Format = "time",
+                Example = JsonValue.Create("08:00") // ¡Esta es la forma moderna de hacerlo!
+            });
         });
         return services;
     }
