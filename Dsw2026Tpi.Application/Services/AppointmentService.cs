@@ -1,8 +1,10 @@
 ﻿using Dsw2026Tpi.Application.Dtos;
 using Dsw2026Tpi.Application.Interfaces;
+using Dsw2026Tpi.Application.Validation;
 using Dsw2026Tpi.CrossCutting.Exceptions;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,33 +20,16 @@ public class AppointmentService : IAppointmentService
         _persistence = persistence;
     }
 
-    public async Task CreateAppointment(AppointmentModel.Request request)
+    public async Task<AppointmentModel.ResponseCreate> CreateAppointment(AppointmentModel.Request request)
     {
+       
         var doctor = await _persistence.GetById<Doctor>(request.DoctorId, "AvailabilityRules", "AvailabilityRules.Slots");
-        if (doctor == null)
-        {
-            throw new EntityNotFoundException($"No existe el Doctor con ID {request.DoctorId}");
-        }
-
-        var availabilitySlot = await _persistence.First<AvailabilitySlot>(s => s.Id == request.AvailabilitySlotId 
-        && s.Availability.DoctorId == request.DoctorId);
-        if (availabilitySlot == null)
-        {
-            throw new EntityNotFoundException($"No se encontró el slot de disponibilidad {request.AvailabilitySlotId} asociado a {request.DoctorId}"); 
-        }
-        else if (availabilitySlot.Status == AvailabilitySlotStatus.BOOKED) 
-        {
-            throw new BusinessRuleException("El turno ya se encuentra reservado", "RESOLVER ESTE PARAMETRO");//TODO: ver que retornar acá
-        }
-
+        var availabilitySlot = await _persistence.First<AvailabilitySlot>(s => s.Id == request.AvailabilitySlotId && s.Availability.DoctorId == request.DoctorId);
         var patient = await _persistence.First<Patient>(p => p.Dni == request.Patient.Dni);
 
-        if (patient == null)
-        {
-            throw new EntityNotFoundException($"No existe el Paciente con DNI {request.Patient.Dni}");
-        }
+        AppointmentValidator.ValidateCreate(doctor, availabilitySlot, patient, request.Reason);
 
-        await _persistence.Add(new Appointment 
+        var newAppoiment = await _persistence.Add(new Appointment 
         {
             Reason = request.Reason,
             Patient = patient,
@@ -52,6 +37,8 @@ public class AppointmentService : IAppointmentService
             AvailabilitySlot = availabilitySlot,
             AvailabilitySlotId = availabilitySlot.Id
         });
+
+        return new AppointmentModel.ResponseCreate(newAppoiment);
         
     }
 
@@ -79,16 +66,7 @@ public class AppointmentService : IAppointmentService
     public async Task CancelAppointmentAsync(Guid id)
     {
         var appointment = await _persistence.GetById<Appointment>(id);
-        if (appointment == null)
-        {
-            throw new Exception("La cita no existe");
-        }
-
-        if (appointment.CancelledAt != null)
-        {
-            throw new Exception("El turno ya se encuentra cancelado");
-        }
-
+        AppointmentValidator.ValidateDelete(appointment);
         appointment.CancelledAt = DateTime.UtcNow;
         await _persistence.Update<Appointment>(appointment);
     }
