@@ -29,15 +29,15 @@ public class AppointmentService : IAppointmentService
 
         AppointmentValidator.ValidateCreate(doctor, availabilitySlot, patient, request.Reason);
 
-        var newAppoiment = await _persistence.Add(new Appointment 
+        var newAppoiment = new Appointment 
         {
             Reason = request.Reason,
             Patient = patient,
             PatientId = patient.Id,
             AvailabilitySlot = availabilitySlot,
             AvailabilitySlotId = availabilitySlot.Id
-        });
-
+        };
+        await _persistence.Add(newAppoiment);
         return new AppointmentModel.ResponseCreate(newAppoiment);
         
     }

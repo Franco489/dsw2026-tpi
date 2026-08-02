@@ -10,5 +10,5 @@ public interface IDoctorService
     Task UpdateDoctor(Guid id, DoctorModel.Request request);
     Task DeleteDoctor(Guid id);
     Task ReactivateDoctor(Guid id);
-    Task<Pagination<AvailabilityModel.DaySchedule>> GetAvailabilities(Guid id, int pageSize, int pageIndex);
+    Task<Pagination<AvailabilityModel.DayScheduleResponse>> GetAvailabilities(Guid id, int pageSize, int pageIndex);
 }
