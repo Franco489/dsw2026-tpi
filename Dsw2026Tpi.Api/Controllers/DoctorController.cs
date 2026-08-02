@@ -53,7 +53,7 @@ public class DoctorController : AppController
     public async Task<IActionResult> DeleteDoctor([FromRoute] Guid id)
     {
         await _service.DeleteDoctor(id);
-        return Ok("Doctor eliminado correctamente");
+        return Ok("ok");
     }
 
     [HttpPut("activate")]
