@@ -10,33 +10,41 @@ namespace Dsw2026Tpi.Application.Validation
 {
     public class SpecialityValidator
     {
+        
         public static void Validate(SpecialityModel.Request request)
         {
-            if(request==null)
+            var errores = new List<(string, string)>(); // Una lista de tuplas, (campo, descripcion de su error)
+
+            if (request==null)
             {
-                throw new ValidationException("La especialidad no puede ser nula", ErrorCodes.VALIDATION_ERROR);
+                errores.Add( ("request","La especialidad no puede ser nula") );
             }
 
             if (string.IsNullOrWhiteSpace(request.name))
             {
-                throw new ValidationException("La especialidad debe tener un nombre", ErrorCodes.VALIDATION_ERROR);
+                errores.Add(("name","La especialidad debe tener un nombre"));
             }
 
             if (string.IsNullOrWhiteSpace(request.description))
             {
-                throw new ValidationException("La especialidad debe tener una descripción", ErrorCodes.VALIDATION_ERROR);
+                errores.Add( ("description","La especialidad debe tener una descripción"));
             }
 
             if (request.name.Length > 100 || request.name.Length <3)
             {
-                throw new ValidationException("El nombre de la especialidad debe estar entre los 3 y 100 caracteres", ErrorCodes.VALIDATION_ERROR);
+                errores.Add( ("name","El nombre de la especialidad debe estar entre los 3 y 100 caracteres") );
             }
 
             if (request.description.Length > 100 || request.description.Length < 10)
             {
-                throw new ValidationException("La descripcion de la especialidad debe estar entre los 10 y 100 caracteres", ErrorCodes.VALIDATION_ERROR);
-            }            
+                errores.Add(("description","La descripcion de la especialidad debe estar entre los 10 y 100 caracteres"));
+            }
 
+            if (errores.Any())
+            {
+                throw new ValidationException("Se encontraron errores en los datos enviados", nameof(ErrorCodes.VALIDATION_ERROR))
+                    .WithDetail(errores);
+            }
         }
     }
 }

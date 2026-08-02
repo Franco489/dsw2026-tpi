@@ -23,6 +23,13 @@ public class ExceptionHandlingMiddleware
         {
             await _next(context);
         }
+  
+        catch (ValidationException ex)
+        {
+            _logger.LogError(ex, "Se produjo un error de validación de datos.");
+            await HandleExceptionAsync(context, ex);
+        }
+
         catch (Exception ex)
         {
             _logger.LogError(ex, "Se produjo un error durante el procesamiento de la solicitud");
@@ -43,7 +50,8 @@ public class ExceptionHandlingMiddleware
             AuthorizationException => HttpStatusCode.Unauthorized,
             _ => HttpStatusCode.InternalServerError,
         };
-        var result = JsonSerializer.Serialize(error);
+        var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }; // Transformacion a camelcase
+        var result = JsonSerializer.Serialize(error, options);
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)status;
         await context.Response.WriteAsync(result);
