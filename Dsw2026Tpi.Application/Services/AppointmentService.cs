@@ -1,8 +1,10 @@
 ﻿using Dsw2026Tpi.Application.Dtos;
 using Dsw2026Tpi.Application.Interfaces;
+using Dsw2026Tpi.Application.Validation;
 using Dsw2026Tpi.CrossCutting.Exceptions;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,29 +22,12 @@ public class AppointmentService : IAppointmentService
 
     public async Task CreateAppointment(AppointmentModel.Request request)
     {
+       
         var doctor = await _persistence.GetById<Doctor>(request.DoctorId, "AvailabilityRules", "AvailabilityRules.Slots");
-        if (doctor == null)
-        {
-            throw new EntityNotFoundException($"No existe el Doctor con ID {request.DoctorId}");
-        }
-
-        var availabilitySlot = await _persistence.First<AvailabilitySlot>(s => s.Id == request.AvailabilitySlotId 
-        && s.Availability.DoctorId == request.DoctorId);
-        if (availabilitySlot == null)
-        {
-            throw new EntityNotFoundException($"No se encontró el slot de disponibilidad {request.AvailabilitySlotId} asociado a {request.DoctorId}"); 
-        }
-        else if (availabilitySlot.Status == AvailabilitySlotStatus.BOOKED) 
-        {
-            throw new BusinessRuleException("El turno ya se encuentra reservado", "RESOLVER ESTE PARAMETRO");//TODO: ver que retornar acá
-        }
-
+        var availabilitySlot = await _persistence.First<AvailabilitySlot>(s => s.Id == request.AvailabilitySlotId && s.Availability.DoctorId == request.DoctorId);
         var patient = await _persistence.First<Patient>(p => p.Dni == request.Patient.Dni);
 
-        if (patient == null)
-        {
-            throw new EntityNotFoundException($"No existe el Paciente con DNI {request.Patient.Dni}");
-        }
+        AppointmentValidator.Validate(doctor, request.AvailabilitySlotId,patient.Dni,availabilitySlot.Status);
 
         await _persistence.Add(new Appointment 
         {
