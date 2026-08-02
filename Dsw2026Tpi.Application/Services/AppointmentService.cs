@@ -27,7 +27,7 @@ public class AppointmentService : IAppointmentService
         var availabilitySlot = await _persistence.First<AvailabilitySlot>(s => s.Id == request.AvailabilitySlotId && s.Availability.DoctorId == request.DoctorId);
         var patient = await _persistence.First<Patient>(p => p.Dni == request.Patient.Dni);
 
-        AppointmentValidator.Validate(doctor, availabilitySlot, patient, request.Reason);
+        AppointmentValidator.ValidateCreate(doctor, availabilitySlot, patient, request.Reason);
 
         var newAppoiment = await _persistence.Add(new Appointment 
         {
@@ -66,16 +66,7 @@ public class AppointmentService : IAppointmentService
     public async Task CancelAppointmentAsync(Guid id)
     {
         var appointment = await _persistence.GetById<Appointment>(id);
-        if (appointment == null)
-        {
-            throw new Exception("La cita no existe");
-        }
-
-        if (appointment.CancelledAt != null)
-        {
-            throw new Exception("El turno ya se encuentra cancelado");
-        }
-
+        AppointmentValidator.ValidateDelete(appointment);
         appointment.CancelledAt = DateTime.UtcNow;
         await _persistence.Update<Appointment>(appointment);
     }

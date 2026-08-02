@@ -38,23 +38,11 @@ public class AppointmentController : AppController
         return Ok(result);
     }
 
-    // cancelar el turno
-    [HttpDelete("{id:guid}")]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> CancelAppointment([FromRoute] Guid id)
     {
-        try
-        {
-            await _service.CancelAppointmentAsync(id);
-            return Ok("Turno cancelado correctamente");
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new
-            {
-                errorCode = "APPOINTMENT_CANCEL_ERROR",
-                message = ex.Message
-            });
-        }
+      await _service.CancelAppointmentAsync(id);
+      return Ok("ok");
     }
 
     // busqueda de turnos
