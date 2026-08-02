@@ -19,6 +19,7 @@ namespace Dsw2026Tpi.Domain.Entities
             get { return _availabilitySlot; }
             set 
             {
+                _availabilitySlot = value;
                 value.Book();
             } 
         }

@@ -20,7 +20,7 @@ public class AppointmentService : IAppointmentService
 
     public async Task CreateAppointment(AppointmentModel.Request request)
     {
-        var doctor = await _persistence.GetById<Doctor>(request.DoctorId);
+        var doctor = await _persistence.GetById<Doctor>(request.DoctorId, "AvailabilityRules", "AvailabilityRules.Slots");
         if (doctor == null)
         {
             throw new EntityNotFoundException($"No existe el Doctor con ID {request.DoctorId}");
@@ -48,7 +48,9 @@ public class AppointmentService : IAppointmentService
         {
             Reason = request.Reason,
             Patient = patient,
-            PatientId = patient.Id
+            PatientId = patient.Id,
+            AvailabilitySlot = availabilitySlot,
+            AvailabilitySlotId = availabilitySlot.Id
         });
         
     }
