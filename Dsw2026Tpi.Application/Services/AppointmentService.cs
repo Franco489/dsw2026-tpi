@@ -6,6 +6,7 @@ using Dsw2026Tpi.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
 
 namespace Dsw2026Tpi.Application.Services;
 
@@ -58,21 +59,32 @@ public class AppointmentService : IAppointmentService
     //ver turnos activos del paciente
     public async Task<IEnumerable<AppointmentModel.PatientResponse>> GetPatientAppointmentsAsync(int dni)
     {
-        var appointments = await _persistence.GetAll<Appointment>();
-        var dniString = dni.ToString();
+        var patient = await _persistence.First<Patient>(p => p.Dni == dni.ToString());
+        if (patient == null) 
+        {
+            throw new EntityNotFoundException($"No existe el paciente con DNI {dni}");
+        }
+        List<AppointmentModel.PatientResponse> result = [];
+        var appointments = await _persistence.GetFiltered<Appointment>((a => a.PatientId == patient.Id && a.Status == AppointmentStatus.BOOKED),
+            "Patient", "AvailabilitySlot", "AvailabilitySlot.Availability", "AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Speciality");
+        //TODO: falta una excepcion acá en caso de que la lista sea null
 
-        return appointments
-            .Where(a => a.Patient != null && a.Patient.Dni == dniString && a.CancelledAt == null)
-            .Select(a => new AppointmentModel.PatientResponse(
-                a.Id,
-                Guid.Empty,
-                string.Empty,
-                string.Empty,
-                DateTime.MinValue,
-                TimeSpan.Zero,
-                a.Reason ?? string.Empty,
-                "BOOKED"
-            ));
+        foreach (var a in appointments) 
+        {
+            //TODO: Hay que traer al doctor y la epecialida....
+            result.Add(new AppointmentModel.PatientResponse
+                (
+                    a.PatientId,
+                    a.AvailabilitySlot.DoctorId,
+                    a.AvailabilitySlot.Availability.Doctor.Name,
+                    a.AvailabilitySlot.Availability.Doctor.Speciality.Name,
+                    a.AvailabilitySlot.Date,
+                    a.AvailabilitySlot.StartTime,
+                    a.Reason,
+                    a.Status.ToString()
+                ));
+        }
+       return result;
     }
 
     //cancelar un turno

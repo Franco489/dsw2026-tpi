@@ -31,7 +31,7 @@ public class AppointmentController : AppController
             {
                 errorCode = "INVALID_DNI",
                 message = "El DNI es obligatorio y debe tener entre 7 y 10 dígitos."
-            });
+            }); //TODO: ESTOI NO VA A ACAAAAAAAAAAAAAAAAAA
         }
 
         var result = await _service.GetPatientAppointmentsAsync(dni);
