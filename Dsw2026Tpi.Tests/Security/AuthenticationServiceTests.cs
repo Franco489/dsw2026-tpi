@@ -1,4 +1,7 @@
-﻿using Dsw2026Tpi.Application.Dtos;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Dsw2026Tpi.Application.Dtos;
 using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.Application.Services.Security;
 using Dsw2026Tpi.CrossCutting.Exceptions;
@@ -7,11 +10,9 @@ using Dsw2026Tpi.Data.Identity;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration; 
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using System;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Dsw2026Tpi.Tests.Services;
@@ -55,41 +56,41 @@ public class AuthenticationServiceTests
     [Fact]
     public async Task LoginAdmin_CuandoEmailEsInvalido_EntoncesLanzaAuthenticationException()
     {
-        // Arrange
         var request = new LoginAdminModel.Request("emailinvalido", "Password123!");
-
-        // Act & Assert
         await Assert.ThrowsAsync<AuthenticationException>(() => _service.LoginAdmin(request));
     }
 
     [Fact]
     public async Task LoginAdmin_CuandoUsuarioNoExiste_EntoncesLanzaAuthenticationException()
     {
-        // Arrange
         var request = new LoginAdminModel.Request("admin@test.com", "Password123!");
         _mockUserManager.FindByEmailAsync(request.Email).Returns((ApplicationUser?)null);
+        await Assert.ThrowsAsync<AuthenticationException>(() => _service.LoginAdmin(request));
+    }
 
-        // Act & Assert
+    [Fact]
+    public async Task LoginAdmin_CuandoPasswordEsIncorrecta_EntoncesLanzaAuthenticationException()
+    {
+        var request = new LoginAdminModel.Request("admin@test.com", "ClaveErronea123!");
+        var user = new ApplicationUser { Id = "admin-id", Email = request.Email, UserName = request.Email };
+
+        _mockUserManager.FindByEmailAsync(request.Email).Returns(user);
+        _mockSignInManager.CheckPassword(user, request.Password).Returns(false);
+
         await Assert.ThrowsAsync<AuthenticationException>(() => _service.LoginAdmin(request));
     }
 
     [Fact]
     public async Task LoginPatient_CuandoEmailODniInvalido_EntoncesLanzaValidationException()
     {
-        // Arrange
         var request = new LoginPatientModel.Request("invalido", "123");
-
-        // Act & Assert
         await Assert.ThrowsAsync<ValidationException>(() => _service.LoginPatient(request));
     }
 
     [Fact]
     public async Task Register_CuandoEmailEsInvalido_EntoncesLanzaValidationException()
     {
-        // Arrange
         var request = new RegisterModel.Request("email-sin-formato", "Password123!");
-
-        // Act & Assert
         await Assert.ThrowsAsync<ValidationException>(() => _service.Register(request));
     }
 }
