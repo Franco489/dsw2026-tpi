@@ -23,33 +23,6 @@ public class AvailabilityService : IAvailabilityService
     {
         _persistence = persistence;
     }
-
-    #region Lógica de Feriados
-
-    //private List<HolidayDto> GetHolidays()
-    //{
-    //    var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "holidays.json");
-
-    //    if (!File.Exists(filePath))
-    //        return new List<HolidayDto>();
-
-    //    var json = File.ReadAllText(filePath);
-    //    return JsonSerializer.Deserialize<List<HolidayDto>>(json, new JsonSerializerOptions
-    //    {
-    //        PropertyNameCaseInsensitive = true
-    //    }) ?? new List<HolidayDto>();
-    //}
-
-    //private bool IsHoliday(DateOnly date)
-    //{
-    //    var holidays = GetHolidays();
-    //    // convierto el DateOnly a DateTime para comparar con el json
-    //    var dateTime = date.ToDateTime(TimeOnly.MinValue);
-    //    return holidays.Any(h => h.Date.Date == dateTime.Date);
-    //}
-
-    #endregion
-
    
     private List<AvailabilitySlot> GenerateSlots(Guid doctorId,TimeOnly startTime, 
         TimeOnly endTime, DayOfWeek dayOfWeek, DateOnly actualDate, int numOfDays) 
@@ -60,13 +33,7 @@ public class AvailabilityService : IAvailabilityService
         {
             var iterationDate = new DateOnly(actualDate.Year, actualDate.Month,d);
 
-            // SI EL DÍA ES FERIADO, NO SE GENERAN SLOTS PARA ESTE DÍA
-            //if (IsHoliday(iterationDate))
-            //{
-            //    continue;
-            //}
-
-            if (iterationDate.DayOfWeek == dayOfWeek)
+            if (iterationDate.DayOfWeek == dayOfWeek && !iterationDate.IsHoliday())
             {
                 var slotStartTime = startTime;
                 while (slotStartTime < endTime)
