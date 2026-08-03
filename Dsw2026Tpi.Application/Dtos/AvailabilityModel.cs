@@ -8,6 +8,7 @@ public record AvailabilityModel
 {
     public record Request(Guid DoctorId, List<DaySchedule> Days);
     public record Response(Guid DoctorId, List<DaySchedule> Days);
-    public record DaySchedule(string Day,TimeOnly StartTime, TimeOnly EndTime);
-    public record DayScheduleResponse(Guid id, string Day, TimeOnly StartTime, TimeOnly EndTime);
+    public record DaySchedule(string Day, TimeOnly StartTime, TimeOnly EndTime);
+    public record DayScheduleResponse(Guid Id, string Day, TimeOnly StartTime, TimeOnly EndTime);
+    public record HolidayDto(DateTime Date, string Name);
 }

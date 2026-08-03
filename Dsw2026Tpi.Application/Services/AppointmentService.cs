@@ -24,62 +24,58 @@ public class AppointmentService : IAppointmentService
 
     public async Task<AppointmentModel.Response> CreateAppointment(AppointmentModel.Request request)
     {
-       
         var doctor = await _persistence.GetById<Doctor>(request.DoctorId, "AvailabilityRules", "AvailabilityRules.Slots", "Speciality");
         var availabilitySlot = await _persistence.First<AvailabilitySlot>(s => s.Id == request.AvailabilitySlotId && s.Availability.DoctorId == request.DoctorId);
         var patient = await _persistence.First<Patient>(p => p.Dni == request.Patient.Dni);
 
         AppointmentValidator.ValidateCreate(doctor, availabilitySlot, patient, request.Reason);
 
-        var newAppoiment = new Appointment 
+        var newAppoiment = new Appointment
         {
             Reason = request.Reason,
             Patient = patient,
             PatientId = patient.Id,
             AvailabilitySlot = availabilitySlot,
             AvailabilitySlotId = availabilitySlot.Id,
-             
         };
 
         await _persistence.Add(newAppoiment);
 
-        return new AppointmentModel.Response(newAppoiment.Id, newAppoiment.Status, availabilitySlot.Date, 
-                                                    new AppointmentModel.PatientDto(patient.Dni, patient.Name),
-                                                    new AppointmentModel.DoctorDto(doctor.Id, doctor.Name, 
-                                                        new AppointmentModel.SpecialtyDto(doctor.Speciality.Id, doctor.Speciality.Name))
+        return new AppointmentModel.Response(newAppoiment.Id, newAppoiment.Status, availabilitySlot.Date,
+            new AppointmentModel.PatientDto(patient.Dni, patient.Name),
+            new AppointmentModel.DoctorDto(doctor.Id, doctor.Name,
+                new AppointmentModel.SpecialtyDto(doctor.Speciality.Id, doctor.Speciality.Name))
         );
-        
     }
 
-    //ver turnos activos del paciente
+    // ver turnos activos del paciente
     public async Task<IEnumerable<AppointmentModel.Response>> GetPatientAppointmentsAsync(int dni)
     {
         var patient = await _persistence.First<Patient>(p => p.Dni == dni.ToString());
-        if (patient == null) 
+        if (patient == null)
         {
             throw new EntityNotFoundException($"No existe el paciente con DNI {dni}");
         }
+
         List<AppointmentModel.Response> result = [];
         var appointments = await _persistence.GetFiltered<Appointment>((a => a.PatientId == patient.Id && a.Status == AppointmentStatus.BOOKED),
             "Patient", "AvailabilitySlot", "AvailabilitySlot.Availability", "AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Speciality");
-        //TODO: falta una excepcion acá en caso de que la lista sea null
 
-        foreach (var a in appointments) 
+        foreach (var a in appointments)
         {
-            //TODO: Hay que traer al doctor y la epecialida....
             result.Add(new AppointmentModel.Response
-                (
-                    a.Id, a.Status, a.AvailabilitySlot.Date,
-                    new AppointmentModel.PatientDto(a.Patient.Dni, a.Patient.Name),
-                    new AppointmentModel.DoctorDto(a.AvailabilitySlot.DoctorId, a.AvailabilitySlot.Availability.Doctor.Name,
-
-                    new AppointmentModel.SpecialtyDto(a.AvailabilitySlot.Availability.Doctor.SpecialityId, a.AvailabilitySlot.Availability.Doctor.Speciality.Name)))
-                );
+            (
+                a.Id, a.Status, a.AvailabilitySlot.Date,
+                new AppointmentModel.PatientDto(a.Patient.Dni, a.Patient.Name),
+                new AppointmentModel.DoctorDto(a.AvailabilitySlot.DoctorId, a.AvailabilitySlot.Availability.Doctor.Name,
+                    new AppointmentModel.SpecialtyDto(a.AvailabilitySlot.Availability.Doctor.SpecialityId, a.AvailabilitySlot.Availability.Doctor.Speciality.Name))
+            ));
         }
-       return result;
+
+        return result;
     }
 
-    //cancelar un turno
+    // cancelar un turno
     public async Task CancelAppointmentAsync(Guid id)
     {
         var appointment = await _persistence.GetById<Appointment>(id);
@@ -88,32 +84,41 @@ public class AppointmentService : IAppointmentService
         await _persistence.Update<Appointment>(appointment);
     }
 
-    public async Task<Pagination<AppointmentModel.Response>> CombinedSearch(int pageSize, int pageIndex, Guid? specialtyId, Guid? doctorId, string dni, DateOnly? date)
-    {       
+    // búsqueda combinada de turnos
+    public async Task<Pagination<AppointmentModel.Response>> CombinedSearch(int pageSize, int pageIndex, Guid? specialtyId, Guid? doctorId, string? dni, DateOnly? date)
+    {
         Expression<Func<Appointment, bool>> combinedPredicate = a =>
-            (string.IsNullOrEmpty(dni) || a.Patient.Dni==dni) &&
+            (string.IsNullOrEmpty(dni) || a.Patient.Dni == dni) &&
             (!doctorId.HasValue || a.AvailabilitySlot.Availability.Doctor.Id == doctorId) &&
             (!specialtyId.HasValue || a.AvailabilitySlot.Availability.Doctor.SpecialityId == specialtyId) &&
             (!date.HasValue || a.AvailabilitySlot.Date == date);
 
         var response = await _persistence.Paginate<Appointment, string>(pageSize, pageIndex,
-                        combinedPredicate,
-                        r => r.Patient.Dni, "Patient","AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Speciality"
+            combinedPredicate,
+            r => r.Patient.Dni, "Patient", "AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Speciality"
         );
-
 
         return response.Map(r => new AppointmentModel.Response(r.Id, r.Status, r.AvailabilitySlot.Date,
-                    new AppointmentModel.PatientDto(r.Patient.Dni, r.Patient.Name),
-                    new AppointmentModel.DoctorDto(r.AvailabilitySlot.DoctorId, r.AvailabilitySlot.Availability.Doctor.Name,
-
-                    new AppointmentModel.SpecialtyDto(r.AvailabilitySlot.Availability.Doctor.SpecialityId, r.AvailabilitySlot.Availability.Doctor.Speciality.Name)))
+            new AppointmentModel.PatientDto(r.Patient.Dni, r.Patient.Name),
+            new AppointmentModel.DoctorDto(r.AvailabilitySlot.DoctorId, r.AvailabilitySlot.Availability.Doctor.Name,
+                new AppointmentModel.SpecialtyDto(r.AvailabilitySlot.Availability.Doctor.SpecialityId, r.AvailabilitySlot.Availability.Doctor.Speciality.Name)))
         );
-
-    
     }
 
+    // completar / actualizar perfil del paciente
+    public async Task CompleteProfileAsync(ProfileModel.UpdateProfileRequest request)
+    {
+        var patients = await _persistence.GetAll<Patient>();
+        var patient = patients.FirstOrDefault(p => p.Dni == request.Dni);
 
+        if (patient == null)
+        {
+            throw new EntityNotFoundException($"No se encontró un paciente registrado con el DNI {request.Dni}");
+        }
 
+        patient.Name = request.Name;
+        patient.PhoneNumber = request.Phone;
 
-
+        await _persistence.Update(patient);
+    }
 }

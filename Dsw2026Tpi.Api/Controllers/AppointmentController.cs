@@ -2,6 +2,7 @@
 using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.Application.Services;
 using Microsoft.AspNetCore.Mvc;
+using Dsw2026Tpi.CrossCutting.Exceptions;
 
 namespace Dsw2026Tpi.Api.Controllers;
 
@@ -51,4 +52,24 @@ public class AppointmentController : AppController
         var result = await _service.CombinedSearch(pageSize,pageIndex,specialtyId, doctorId, dni, date);
         return Ok(result);
     }
+
+    // completar el perfil del paciente
+    [HttpPut("profile")]
+    public async Task<IActionResult> CompleteProfile([FromBody] ProfileModel.UpdateProfileRequest request)
+    {
+        try
+        {
+            await _service.CompleteProfileAsync(request);
+            return Ok(new { message = "El perfil del paciente se actualizó con éxito." });
+        }
+        catch (EntityNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
 }
