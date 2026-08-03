@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2026Tpi.Api.Controllers
 {
-    [Route("specialities")]
+    [Route("api/specialities")]
     public class SpecialityController : AppController
     {
         private readonly ISpecialityService _service;
@@ -22,25 +22,23 @@ namespace Dsw2026Tpi.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> AddSpeciality(SpecialityModel.Request request)
         {
-            await _service.AddSpeciality(request);
-            return Created();
+            return Ok(await _service.AddSpeciality(request));
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateSpeciality(Guid id, SpecialityModel.Request request)
         {
-            await _service.UpdateSpeciality(id, request);
-            return Ok();
+            return Ok(await _service.UpdateSpeciality(id, request));
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSpeciality([FromRoute] Guid id)
         {
             await _service.DeleteSpeciality(id);
-            return Ok();
+            return Ok("Ok");
         }
 
-        [HttpPut("/activate")]
+        [HttpPut("activate")]
         public async Task<IActionResult> ReactivateSpeciality([FromQuery] Guid id)
         {
             await _service.ReactivateSpeciality(id);

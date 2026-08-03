@@ -82,11 +82,28 @@ public class AppointmentService : IAppointmentService
     //cancelar un turno
     public async Task CancelAppointmentAsync(Guid id)
     {
-        var appointment = await _persistence.GetById<Appointment>(id);
+        var appointment = await _persistence.GetById<Appointment>(id, "AvailabilitySlot");
         AppointmentValidator.ValidateDelete(appointment);
         appointment.Cancel();
         await _persistence.Update<Appointment>(appointment);
     }
+
+
+    public async Task<AppointmentModel.Response> GetAppointmentsByDate (DateOnly date)
+    {
+        var appointment = await _persistence.First<Appointment>(a => a.AvailabilitySlot.Date == date, "Patient", "AvailabilitySlot"
+            , "AvailabilitySlot.Availability", "AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Speciality");
+        if (appointment == null)
+        {
+            throw new EntityNotFoundException($"No existe el turno con fecha {date}");
+        }
+        return new AppointmentModel.Response(appointment.Id, appointment.Status, appointment.AvailabilitySlot.Date,
+                    new AppointmentModel.PatientDto(appointment.Patient.Dni, appointment.Patient.Name),
+                    new AppointmentModel.DoctorDto(appointment.AvailabilitySlot.DoctorId, appointment.AvailabilitySlot.Availability.Doctor.Name,
+                    new AppointmentModel.SpecialtyDto(appointment.AvailabilitySlot.Availability.Doctor.SpecialityId, appointment.AvailabilitySlot.Availability.Doctor.Speciality.Name)));
+    }
+
+
 
     public async Task<Pagination<AppointmentModel.Response>> CombinedSearch(int pageSize, int pageIndex, Guid? specialtyId, Guid? doctorId, string dni, DateOnly? date)
     {       

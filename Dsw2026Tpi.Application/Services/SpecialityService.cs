@@ -17,11 +17,12 @@ namespace Dsw2026Tpi.Application.Services
         {
             _persistence = persistence;
         }
-        public async Task AddSpeciality(SpecialityModel.Request request)
+        public async Task<SpecialityModel.CreateResponse> AddSpeciality(SpecialityModel.Request request)
         {
             SpecialityValidator.Validate(request);
             var NewSpeciality = new Speciality(request.name, request.description);
             await _persistence.Add<Speciality>(NewSpeciality);
+            return new SpecialityModel.CreateResponse(NewSpeciality.Id, NewSpeciality.Name, NewSpeciality.Description);
         }
 
         public async Task DeleteSpeciality(Guid id)
@@ -34,12 +35,9 @@ namespace Dsw2026Tpi.Application.Services
             speciality.Delete();
             await _persistence.Update(speciality);
         }
-        public Task<Speciality> GetSpecialityById(Guid id)
-        {
-            throw new NotImplementedException();
-        }
+        
 
-        public async Task UpdateSpeciality(Guid id, SpecialityModel.Request request)
+        public async Task<SpecialityModel.Response> UpdateSpeciality(Guid id, SpecialityModel.Request request)
         {
             var speciality = await _persistence.GetById<Speciality>(id);
             if (speciality is null)
@@ -49,6 +47,7 @@ namespace Dsw2026Tpi.Application.Services
             SpecialityValidator.Validate(request);
             speciality.Update(request.name, request.description);
             await _persistence.Update<Speciality>(speciality);
+            return new SpecialityModel.Response(speciality.Name, speciality.Description);
         }
 
 

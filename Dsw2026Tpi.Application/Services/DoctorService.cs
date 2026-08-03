@@ -16,18 +16,15 @@ public class DoctorService : IDoctorService
         _persistence = persistence;
     }
 
-    public async Task CreateDoctor(DoctorModel.Request request)
+    public async Task<Pagination<DoctorModel.Response>> GetAll(int pageSize, int pageIndex, string? name = null)
     {
-        DoctorValidator.Validate(request);
-        var speciality = await _persistence.GetById<Speciality>(request.SpecialityId);
-        if(speciality == null)
-        {
-            throw new EntityNotFoundException(nameof(Speciality));
-        }
+        var doctors = await _persistence.Paginate<Doctor, string>(pageSize, pageIndex, d => string.IsNullOrWhiteSpace(name) && !d.Deleted ||
+                                                   d.Name.Contains(name) && !d.Deleted, x => x.Name, nameof(Doctor.Speciality));
 
-        var doctor = new Doctor(request.Name, request.LicenseNumber, request.SpecialityId);
-        await _persistence.Add(doctor);
+        return doctors.Map(d => new DoctorModel.Response(d.Id, d.Name, d.LicenseNumber,
+            new DoctorModel.SpecialityDto(d.Speciality?.Id, d.Speciality?.Name)));
     }
+
 
     public async Task<Pagination<AvailabilityModel.DayScheduleResponse  >> GetAvailabilities(Guid id, int pageSize, int pageIndex)
     {
@@ -38,22 +35,28 @@ public class DoctorService : IDoctorService
         }
 
         var slots = await _persistence.Paginate<AvailabilitySlot, DateOnly>(pageSize, pageIndex,
-                                                                   s => s.Availability.DoctorId == id && s.Status == 0, 
-                                                                   s => s.Date);
+                                                                   s => s.Availability.DoctorId == id && s.Status == 0, s => s.Date);
         return slots.Map(s => new AvailabilityModel.DayScheduleResponse(s.Id, s.Date.ToString("dd/MM/yyyy"), s.StartTime, s.EndTime));
-
-
     }
 
-    public async Task<Pagination<DoctorModel.Response>> GetAll(int pageSize, int pageIndex, string? name = null)
+    public async Task<DoctorModel.Response> CreateDoctor(DoctorModel.Request request)
     {
-        var doctors = await _persistence.Paginate<Doctor, string>(pageSize, pageIndex, d => string.IsNullOrWhiteSpace(name) && !d.Deleted ||
-                                                   d.Name.Contains(name) && !d.Deleted, x => x.Name, nameof(Doctor.Speciality));
+        DoctorValidator.Validate(request);
+        var speciality = await _persistence.GetById<Speciality>(request.SpecialityId);
+        if(speciality == null)
+        {
+            throw new EntityNotFoundException(nameof(Speciality));
+        }
 
-        return doctors.Map(d => new DoctorModel.Response(d.Id, d.Name, d.LicenseNumber,
-            new DoctorModel.SpecialityDto(d.Speciality?.Id, d.Speciality?.Name)));
+        var doctor = new Doctor(request.Name, request.LicenseNumber, request.SpecialityId);
+        await _persistence.Add(doctor);
+
+        return new DoctorModel.Response(doctor.Id, doctor.Name, doctor.LicenseNumber,
+            new DoctorModel.SpecialityDto(speciality.Id, speciality.Name));
     }
-    public async Task UpdateDoctor(Guid id, DoctorModel.Request request)
+
+
+    public async Task<DoctorModel.Response> UpdateDoctor(Guid id, DoctorModel.Request request)
     {
         var speciality = await _persistence.GetById<Speciality>(request.SpecialityId);
         if (speciality == null)
@@ -69,6 +72,9 @@ public class DoctorService : IDoctorService
         DoctorValidator.Validate(request);
         doctor.Update(request.Name, request.LicenseNumber, request.SpecialityId);
         await _persistence.Update(doctor);
+
+        return new DoctorModel.Response(doctor.Id, doctor.Name, doctor.LicenseNumber,
+            new DoctorModel.SpecialityDto(speciality.Id, speciality.Name));
     }
 
     public async Task DeleteDoctor(Guid id)

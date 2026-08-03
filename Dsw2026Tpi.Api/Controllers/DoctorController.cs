@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2026Tpi.Api.Controllers;
 
-[Route("doctors")]
+[Route("api/doctors")]
 //[Authorize(Policy = Policies.AdminPolicy)]
 public class DoctorController : AppController
 {
@@ -25,14 +25,6 @@ public class DoctorController : AppController
         return Ok(doctors);
     }
 
-    [HttpPost]
-    [AllowAnonymous]
-    public async Task<IActionResult> CreateDoctor(DoctorModel.Request request)
-    {
-        await _service.CreateDoctor(request);
-        return Created();
-    }
-
     [HttpGet("{id}/availabilities")]
     [AllowAnonymous]
 
@@ -42,11 +34,21 @@ public class DoctorController : AppController
         return Ok(availabilities);
     }
 
+
+    [HttpPost]
+    [AllowAnonymous]
+    public async Task<IActionResult> CreateDoctor(DoctorModel.Request request)
+    {
+        var doctor = await _service.CreateDoctor(request);
+        return Ok(doctor);
+    }
+
+
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateDoctor(Guid id, DoctorModel.Request request)
     {
-        await _service.UpdateDoctor(id, request);
-        return Ok("Doctor actualizado correctamente");
+        var doctor = await _service.UpdateDoctor(id, request);
+        return Ok(doctor);
     }
 
     [HttpDelete("{id}")]
