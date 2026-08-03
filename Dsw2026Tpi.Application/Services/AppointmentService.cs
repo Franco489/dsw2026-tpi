@@ -95,10 +95,15 @@ public class AppointmentService : IAppointmentService
         //var doctor = await _persistence.GetById<Doctor>( doctorId ?? Guid.Empty, "AvailabilityRules", "AvailabilityRules.Slots", "Speciality");
         //var patient = await _persistence.First<Patient>(p => p.Dni == dni);
         //var appointments = await _persistence.GetFiltered<Appointment>(a => a.PatientId == patient.Id, "Patient");
-
+       
+        Expression<Func<Appointment, bool>> combinedPredicate = a =>
+            (string.IsNullOrEmpty(dni) || a.Patient.Dni==dni) &&
+            (!doctorId.HasValue || a.AvailabilitySlot.Availability.Doctor.Id == doctorId) &&
+            (!specialtyId.HasValue || a.AvailabilitySlot.Availability.Doctor.SpecialityId == specialtyId) &&
+            (!date.HasValue || a.AvailabilitySlot.Date == date);
 
         var response = await _persistence.Paginate<Appointment, string>(pageSize, pageIndex,
-                        r => r.Patient.Dni == dni || r.AvailabilitySlot.Availability.Doctor.SpecialityId == specialtyId,
+                        combinedPredicate,
                         r => r.Patient.Dni, "Patient","AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Speciality");
 
 
