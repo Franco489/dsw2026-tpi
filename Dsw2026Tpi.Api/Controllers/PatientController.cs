@@ -16,7 +16,7 @@ namespace Dsw2026Tpi.Api.Controllers
         }
 
         [HttpPut("profile")]
-        public async Task<IActionResult> CompleteProfile(string dni, [FromBody] ProfileModel.Request request)
+        public async Task<IActionResult> CompleteProfile([FromRoute] string dni, [FromBody] ProfileModel.Request request)
         {
             try
             {
