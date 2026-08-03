@@ -12,5 +12,4 @@ public interface IAppointmentService
     Task<IEnumerable<AppointmentModel.Response>> GetPatientAppointmentsAsync(int dni);
     Task CancelAppointmentAsync(Guid id);
     Task<Pagination<AppointmentModel.Response>> CombinedSearch(int pageSize, int pageIndex, Guid? specialtyId, Guid? doctorId, string? dni, DateOnly? date);
-    Task CompleteProfileAsync(ProfileModel.UpdateProfileRequest request);
 }

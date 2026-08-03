@@ -17,7 +17,7 @@ public class AppointmentController : AppController
     }
 
    [HttpPost]
-   public async Task<IActionResult> createAppointment([FromBody] AppointmentModel.Request request)
+   public async Task<IActionResult> CreateAppointment([FromBody] AppointmentModel.Request request)
     {
         var response = await _service.CreateAppointment(request);
         return Ok(response);
@@ -26,15 +26,6 @@ public class AppointmentController : AppController
     [HttpGet("patient")]
     public async Task<IActionResult> GetPatientAppointments([FromQuery] int dni)
     {
-        if (dni <= 0 || dni.ToString().Length < 7 || dni.ToString().Length > 10)
-        {
-            return BadRequest(new
-            {
-                errorCode = "INVALID_DNI",
-                message = "El DNI es obligatorio y debe tener entre 7 y 10 dígitos."
-            }); //TODO: ESTOI NO VA A ACAAAAAAAAAAAAAAAAAA
-        }
-
         var result = await _service.GetPatientAppointmentsAsync(dni);
         return Ok(result);
     }
@@ -52,24 +43,4 @@ public class AppointmentController : AppController
         var result = await _service.CombinedSearch(pageSize,pageIndex,specialtyId, doctorId, dni, date);
         return Ok(result);
     }
-
-    // completar el perfil del paciente
-    [HttpPut("profile")]
-    public async Task<IActionResult> CompleteProfile([FromBody] ProfileModel.UpdateProfileRequest request)
-    {
-        try
-        {
-            await _service.CompleteProfileAsync(request);
-            return Ok(new { message = "El perfil del paciente se actualizó con éxito." });
-        }
-        catch (EntityNotFoundException ex)
-        {
-            return NotFound(new { message = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-    }
-
 }

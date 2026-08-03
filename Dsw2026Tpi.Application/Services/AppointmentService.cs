@@ -104,21 +104,4 @@ public class AppointmentService : IAppointmentService
                 new AppointmentModel.SpecialtyDto(r.AvailabilitySlot.Availability.Doctor.SpecialityId, r.AvailabilitySlot.Availability.Doctor.Speciality.Name)))
         );
     }
-
-    // completar / actualizar perfil del paciente
-    public async Task CompleteProfileAsync(ProfileModel.UpdateProfileRequest request)
-    {
-        var patients = await _persistence.GetAll<Patient>();
-        var patient = patients.FirstOrDefault(p => p.Dni == request.Dni);
-
-        if (patient == null)
-        {
-            throw new EntityNotFoundException($"No se encontró un paciente registrado con el DNI {request.Dni}");
-        }
-
-        patient.Name = request.Name;
-        patient.PhoneNumber = request.Phone;
-
-        await _persistence.Update(patient);
-    }
 }
