@@ -84,16 +84,12 @@ public class AppointmentService : IAppointmentService
     {
         var appointment = await _persistence.GetById<Appointment>(id);
         AppointmentValidator.ValidateDelete(appointment);
-        appointment.CancelledAt = DateTime.UtcNow;
+        appointment.Cancel();
         await _persistence.Update<Appointment>(appointment);
     }
 
     public async Task<Pagination<AppointmentModel.Response>> CombinedSearch(int pageSize, int pageIndex, Guid? specialtyId, Guid? doctorId, string dni, DateOnly? date)
-    {
-        //var doctor = await _persistence.GetById<Doctor>( doctorId ?? Guid.Empty, "AvailabilityRules", "AvailabilityRules.Slots", "Speciality");
-        //var patient = await _persistence.First<Patient>(p => p.Dni == dni);
-        //var appointments = await _persistence.GetFiltered<Appointment>(a => a.PatientId == patient.Id, "Patient");
-       
+    {       
         Expression<Func<Appointment, bool>> combinedPredicate = a =>
             (string.IsNullOrEmpty(dni) || a.Patient.Dni==dni) &&
             (!doctorId.HasValue || a.AvailabilitySlot.Availability.Doctor.Id == doctorId) &&
