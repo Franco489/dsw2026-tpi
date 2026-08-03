@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using static Dsw2026Tpi.Application.Dtos.AvailabilityModel;
 
@@ -22,40 +23,6 @@ public class AvailabilityService : IAvailabilityService
     public AvailabilityService(IPersistence persistence)
     {
         _persistence = persistence;
-    }
-   
-    private List<AvailabilitySlot> GenerateSlots(Guid doctorId,TimeOnly startTime, 
-        TimeOnly endTime, DayOfWeek dayOfWeek, DateOnly actualDate, int numOfDays) 
-    {
-        ICollection<AvailabilitySlot> slots = [];
-
-        for (int d = actualDate.Day; d <= numOfDays; d++)
-        {
-            var iterationDate = new DateOnly(actualDate.Year, actualDate.Month,d);
-
-            if (iterationDate.DayOfWeek == dayOfWeek && !iterationDate.IsHoliday())
-            {
-                var slotStartTime = startTime;
-                while (slotStartTime < endTime)
-                {
-                    var slotEndTime = slotStartTime.AddMinutes(30);
-
-                    if (slotEndTime > endTime)
-                    {
-                        break;
-                    }
-                    slots.Add(new AvailabilitySlot
-                    {
-                        Date = iterationDate,
-                        StartTime = slotStartTime,
-                        EndTime = slotEndTime,
-                        DoctorId = doctorId
-                    });
-                    slotStartTime = slotEndTime;
-                }
-            }
-        }
-        return slots.ToList();
     }
 
     public async Task CreateAvailabilitiesAsync(AvailabilityModel.Request request)
@@ -88,8 +55,7 @@ public class AvailabilityService : IAvailabilityService
                 EndTime = daySchedule.EndTime,
                 Slots = []
             };
-
-            avaRule.Slots = GenerateSlots(request.DoctorId, daySchedule.StartTime, 
+            avaRule.GenerateSlots(request.DoctorId, daySchedule.StartTime, 
                 daySchedule.EndTime, dayOfWeek, actualDate, numOfDays);
             if (avaRule.Slots.Any())
             {
@@ -130,11 +96,7 @@ public class AvailabilityService : IAvailabilityService
                     rule.StartTime = daySchedule.StartTime;
                     rule.EndTime = daySchedule.EndTime;
                     rule.Slots.Clear();
-
-                    foreach(var slot in GenerateSlots(request.DoctorId, daySchedule.StartTime, daySchedule.EndTime, dayOfWeek, actualDate, numOfDays))
-                    {
-                        rule.Slots.Add(slot);
-                    }
+                    rule.GenerateSlots(request.DoctorId, daySchedule.StartTime, daySchedule.EndTime, dayOfWeek, actualDate, numOfDays);
                 }
             }
         }
