@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net.WebSockets;
 
 namespace Dsw2026Tpi.Application.Services;
@@ -91,12 +92,14 @@ public class AppointmentService : IAppointmentService
 
     public async Task<Pagination<AppointmentModel.ResponseCreate>> CombinedSearch(int pageSize, int pageIndex, Guid? specialtyId, Guid? doctorId, string dni, DateOnly? date)
     {
-        var doctor = await _persistence.GetById<Doctor>( doctorId ?? Guid.Empty, "AvailabilityRules", "AvailabilityRules.Slots", "Speciality");
-        var patient = await _persistence.First<Patient>(p => p.Dni == dni);
-        var appointments = await _persistence.GetFiltered<Appointment>(a => a.PatientId == patient.Id);
+        //var doctor = await _persistence.GetById<Doctor>( doctorId ?? Guid.Empty, "AvailabilityRules", "AvailabilityRules.Slots", "Speciality");
+        //var patient = await _persistence.First<Patient>(p => p.Dni == dni);
+        //var appointments = await _persistence.GetFiltered<Appointment>(a => a.PatientId == patient.Id, "Patient");
+
 
         var response = await _persistence.Paginate<Appointment, string>(pageSize, pageIndex,
-                        r => r.PatientId == patient.Id, r => r.Patient.Dni, nameof(Appointment.AvailabilitySlot.Availability.Doctor));
+                        r => r.Patient.Dni == dni || r.AvailabilitySlot.Availability.Doctor.SpecialityId == specialtyId,
+                        r => r.Patient.Dni, "Patient","AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Speciality");
 
 
         return response.Map(r => new AppointmentModel.ResponseCreate(r.Id, r.Status,
