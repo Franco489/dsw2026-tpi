@@ -14,9 +14,9 @@ public record AppointmentModel
         Guid Id,
         Guid DoctorId,
         string DoctorName,
-        string SpecialtyName,
-        DateTime Date,
-        TimeSpan StartTime,
+        string SpecialityName,
+        DateOnly Date,
+        TimeOnly StartTime,
         string Reason,
         string Status
     );
