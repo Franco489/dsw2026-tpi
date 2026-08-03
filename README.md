@@ -10,8 +10,6 @@
 
 ## Descripción de Endpoints
 
-## Descripción de Endpoints
-
 ### Módulo de Autenticación
 * **POST:** `"/auth/admin/register"` : Nos permite registrar un nuevo administrador. Se ingresa el email y contraseña deseados para el administrador, los cuales deben cumplir un determinado formato: Tiene que estar compuesta por lo menos de 8 dígitos en donde debe contener por lo menos un número, una letra mayúscula y minúscula y un carácter especial (por ejemplo: @, !, ?, #, $, %, etc.).
 * **POST:** `"/auth/admin/login"` : Permite autenticar un administrador, donde simplemente se ingresa el email y contraseña.
