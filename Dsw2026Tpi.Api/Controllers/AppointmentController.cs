@@ -2,6 +2,7 @@
 using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.Application.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Dsw2026Tpi.Api.Controllers;
 
@@ -16,7 +17,8 @@ public class AppointmentController : AppController
     }
 
    [HttpPost]
-   public async Task<IActionResult> createAppointment([FromBody] AppointmentModel.Request request)
+   [EnableRateLimiting("BookingPolicy")]
+    public async Task<IActionResult> createAppointment([FromBody] AppointmentModel.Request request)
     {
         var response = await _service.CreateAppointment(request);
         return Ok(response);
