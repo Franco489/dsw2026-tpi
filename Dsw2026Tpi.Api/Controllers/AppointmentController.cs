@@ -45,15 +45,10 @@ public class AppointmentController : AppController
       return Ok("ok");
     }
 
-    // busqueda de turnos
     [HttpGet("search")]
-    public async Task<IActionResult> SearchAppointments(
-        [FromQuery] Guid? specialtyId,
-        [FromQuery] Guid? doctorId,
-        [FromQuery] string? dni,
-        [FromQuery] DateTime? date)
+    public async Task<IActionResult> SearchAppointments([FromQuery] Guid? specialtyId,[FromQuery] Guid? doctorId,[FromQuery] string? dni, [FromQuery] DateOnly? date, [FromQuery] int pageSize = 10, [FromQuery] int pageIndex = 0)
     {
-        var result = await _service.SearchAppointmentsAsync(specialtyId, doctorId, dni, date);
+        var result = await _service.CombinedSearch(pageSize,pageIndex,specialtyId, doctorId, dni, date);
         return Ok(result);
     }
 }

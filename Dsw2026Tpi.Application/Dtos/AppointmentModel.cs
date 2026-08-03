@@ -20,17 +20,6 @@ public record AppointmentModel
         string Status
     );
 
-    public record SearchResponse(
-        Guid Id,
-        string Specialty,
-        string Doctor,
-        string PatientName,
-        string PatientDni,
-        DateTime Date,
-        TimeSpan AvailableTime,
-        string Status
-    );
-
     public record PatientDto(string Dni, string Name);
     public record DoctorDto(Guid Id, string Name, SpecialtyDto Specialty);
     public record SpecialtyDto(Guid Id, string Name);

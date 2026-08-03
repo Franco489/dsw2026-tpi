@@ -89,26 +89,27 @@ public class AppointmentService : IAppointmentService
         await _persistence.Update<Appointment>(appointment);
     }
 
-    //búsqueda avanzada de turnos (Admin)
-    public async Task<IEnumerable<AppointmentModel.SearchResponse>> SearchAppointmentsAsync(Guid? specialtyId, Guid? doctorId, string? dni, DateTime? date)
+    public async Task<Pagination<AppointmentModel.ResponseCreate>> CombinedSearch(int pageSize, int pageIndex, Guid? specialtyId, Guid? doctorId, string dni, DateOnly? date)
     {
-        var appointments = await _persistence.GetAll<Appointment>();
-        var query = appointments.AsQueryable();
+        var doctor = await _persistence.GetById<Doctor>( doctorId ?? Guid.Empty, "AvailabilityRules", "AvailabilityRules.Slots", "Speciality");
+        var patient = await _persistence.First<Patient>(p => p.Dni == dni);
+        var appointments = await _persistence.GetFiltered<Appointment>(a => a.PatientId == patient.Id);
 
-        if (!string.IsNullOrEmpty(dni))
-        {
-            query = query.Where(a => a.Patient != null && a.Patient.Dni == dni);
-        }
+        var response = await _persistence.Paginate<Appointment, string>(pageSize, pageIndex,
+                        r => r.PatientId == patient.Id, r => r.Patient.Dni, nameof(Appointment.AvailabilitySlot.Availability.Doctor));
 
-        return query.Select(a => new AppointmentModel.SearchResponse(
-            a.Id,
-            string.Empty,
-            string.Empty,
-            a.Patient != null ? a.Patient.Name : string.Empty,
-            a.Patient != null ? a.Patient.Dni : string.Empty,
-            DateTime.MinValue,
-            TimeSpan.Zero,
-            a.CancelledAt != null ? "CANCELLED" : "BOOKED"
-        ));
+
+        return response.Map(r => new AppointmentModel.ResponseCreate(r.Id, r.Status,
+                    new AppointmentModel.PatientDto(r.Patient.Dni, r.Patient.Name),
+                    new AppointmentModel.DoctorDto(r.AvailabilitySlot.DoctorId, r.AvailabilitySlot.Availability.Doctor.Name,
+
+                    new AppointmentModel.SpecialtyDto(r.AvailabilitySlot.Availability.Doctor.SpecialityId, r.AvailabilitySlot.Availability.Doctor.Speciality.Name))));
+
+    
     }
+
+
+
+
+
 }
