@@ -1,5 +1,6 @@
 ﻿using Dsw2026Tpi.Application.Dtos;
 using Dsw2026Tpi.Application.Interfaces;
+using Dsw2026Tpi.CrossCutting.Exceptions;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
 using System;
@@ -113,5 +114,21 @@ public class AppointmentService : IAppointmentService
             TimeSpan.Zero,
             a.CancelledAt != null ? "CANCELLED" : "BOOKED"
         ));
+    }
+    // 4. Completar / actualizar perfil del paciente
+    public async Task CompleteProfileAsync(ProfileModel.UpdateProfileRequest request)
+    {
+        var patients = await _persistence.GetAll<Patient>();
+        var patient = patients.FirstOrDefault(p => p.Dni == request.Dni);
+
+        if (patient == null)
+        {
+            throw new EntityNotFoundException($"No se encontró un paciente registrado con ese DNI {request.Dni}");
+        }
+
+        patient.Name = request.Name;
+        patient.PhoneNumber = request.Phone;
+
+        await _persistence.Update(patient);
     }
 }

@@ -8,12 +8,15 @@ namespace Dsw2026Tpi.Application.Interfaces;
 public interface IAppointmentService 
 {
     Task CreateAppointment(AppointmentModel.request request);
-// 1. Obtener turnos activos del paciente por DNI
+//obtener turnos activos del paciente por DNI
     Task<IEnumerable<AppointmentModel.patientResponse>> GetPatientAppointmentsAsync(int dni);
 
-    // 2. Cancelar turno por ID
+//cancelar turno por ID
     Task CancelAppointmentAsync(Guid id);
 
-    // 3. Búsqueda avanzada de turnos (Admin)
+//búsqueda avanzada de turnos (admin)
     Task<IEnumerable<AppointmentModel.searchResponse>> SearchAppointmentsAsync(Guid? specialtyId, Guid? doctorId, string? dni, DateTime? date);
+
+ //completar o actualizar el perfil del paciente
+    Task CompleteProfileAsync(ProfileModel.UpdateProfileRequest request);
 }
