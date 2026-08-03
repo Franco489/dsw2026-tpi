@@ -38,7 +38,8 @@ public class DoctorService : IDoctorService
         }
 
         var slots = await _persistence.Paginate<AvailabilitySlot, DateOnly>(pageSize, pageIndex,
-                                                                   s => s.Availability.DoctorId == id, s => s.Date);
+                                                                   s => s.Availability.DoctorId == id && s.Status == 0, 
+                                                                   s => s.Date);
         return slots.Map(s => new AvailabilityModel.DayScheduleResponse(s.Id, s.Date.ToString("dd/MM/yyyy"), s.StartTime, s.EndTime));
 
 
