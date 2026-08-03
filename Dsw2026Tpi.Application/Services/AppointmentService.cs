@@ -24,7 +24,7 @@ public class AppointmentService : IAppointmentService
     public async Task<AppointmentModel.ResponseCreate> CreateAppointment(AppointmentModel.Request request)
     {
        
-        var doctor = await _persistence.GetById<Doctor>(request.DoctorId, "AvailabilityRules", "AvailabilityRules.Slots");
+        var doctor = await _persistence.GetById<Doctor>(request.DoctorId, "AvailabilityRules", "AvailabilityRules.Slots", "Speciality");
         var availabilitySlot = await _persistence.First<AvailabilitySlot>(s => s.Id == request.AvailabilitySlotId && s.Availability.DoctorId == request.DoctorId);
         var patient = await _persistence.First<Patient>(p => p.Dni == request.Patient.Dni);
 
@@ -38,8 +38,14 @@ public class AppointmentService : IAppointmentService
             AvailabilitySlot = availabilitySlot,
             AvailabilitySlotId = availabilitySlot.Id
         };
+
         await _persistence.Add(newAppoiment);
-        return new AppointmentModel.ResponseCreate(newAppoiment);
+
+        return new AppointmentModel.ResponseCreate(newAppoiment.Id, newAppoiment.Status, 
+                                                    new AppointmentModel.PatientDto(patient.Dni, patient.Name),
+                                                    new AppointmentModel.DoctorDto(doctor.Id, doctor.Name, 
+                                                        new AppointmentModel.SpecialtyDto(doctor.Speciality.Id, doctor.Speciality.Name))
+        );
         
     }
 
