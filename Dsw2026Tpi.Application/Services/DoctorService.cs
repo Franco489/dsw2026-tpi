@@ -29,7 +29,7 @@ public class DoctorService : IDoctorService
         await _persistence.Add(doctor);
     }
 
-    public async Task<Pagination<AvailabilityModel.DaySchedule>> GetAvailabilities(Guid id, int pageSize, int pageIndex)
+    public async Task<Pagination<AvailabilityModel.DayScheduleResponse  >> GetAvailabilities(Guid id, int pageSize, int pageIndex)
     {
         var doctor = await _persistence.GetById<Doctor>(id);
         if (doctor == null)
@@ -38,8 +38,9 @@ public class DoctorService : IDoctorService
         }
 
         var slots = await _persistence.Paginate<AvailabilitySlot, DateOnly>(pageSize, pageIndex,
-                                                                   s => s.Availability.DoctorId == id, s => s.Date);
-        return slots.Map(s => new AvailabilityModel.DaySchedule(s.Date.ToString("dd/MM/yyyy"), s.EndTime, s.StartTime));
+                                                                   s => s.Availability.DoctorId == id && s.Status == 0, 
+                                                                   s => s.Date);
+        return slots.Map(s => new AvailabilityModel.DayScheduleResponse(s.Id, s.Date.ToString("dd/MM/yyyy"), s.StartTime, s.EndTime));
 
 
     }

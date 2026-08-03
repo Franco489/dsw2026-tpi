@@ -8,27 +8,21 @@ namespace Dsw2026Tpi.Application.Dtos;
 public record AppointmentModel
 {
     public record Request(Guid DoctorId, Guid AvailabilitySlotId, PatientAux Patient, string Reason);
-    public record ResponseCreate(Appointment NewAppointment);
     public record PatientAux(string Dni);
     public record PatientResponse(
         Guid Id,
         Guid DoctorId,
         string DoctorName,
-        string SpecialtyName,
-        DateTime Date,
-        TimeSpan StartTime,
+        string SpecialityName,
+        DateOnly Date,
+        TimeOnly StartTime,
         string Reason,
         string Status
     );
 
-    public record SearchResponse(
-        Guid Id,
-        string Specialty,
-        string Doctor,
-        string PatientName,
-        string PatientDni,
-        DateTime Date,
-        TimeSpan AvailableTime,
-        string Status
-    );
+    public record PatientDto(string Dni, string Name);
+    public record DoctorDto(Guid Id, string Name, SpecialtyDto Specialty);
+    public record SpecialtyDto(Guid Id, string Name);
+    public record Response(Guid Id, AppointmentStatus Status, DateOnly Date, PatientDto Patient, DoctorDto Doctor);
+
 }

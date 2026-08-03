@@ -23,5 +23,14 @@ namespace Dsw2026Tpi.Domain.Entities
             Status = AvailabilitySlotStatus.BOOKED;
         }
 
+        public void Cancel()
+        {
+            if (Status == AvailabilitySlotStatus.AVAILABLE)
+            {
+                throw new InvalidOperationException("El turno ya se encuentra disponible.");
+            }
+            Status = AvailabilitySlotStatus.AVAILABLE;
+        }
+
     }
 }

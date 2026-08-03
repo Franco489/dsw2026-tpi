@@ -13,5 +13,6 @@ namespace Dsw2026Tpi.Domain.Entities
         public string PhoneNumber {  get; set; } = string.Empty;
         public string Email { get; set; }
         public Guid UserId { get; set; }
+        public ICollection<Appointment> Appointments { get; set; } = [];
     }
 }

@@ -28,5 +28,12 @@ namespace Dsw2026Tpi.Domain.Entities
             Status = status;
             Reason = reason;
         }
+
+        public void Cancel()
+        {
+            Status = AppointmentStatus.CANCELLED;
+            CancelledAt = DateTime.Now;
+            AvailabilitySlot.Cancel();
+        }
     }
 }
