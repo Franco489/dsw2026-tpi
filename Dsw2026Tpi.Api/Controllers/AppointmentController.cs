@@ -18,7 +18,7 @@ public class AppointmentController : AppController
 
    [HttpPost]
    [EnableRateLimiting("BookingPolicy")]
-    public async Task<IActionResult> createAppointment([FromBody] AppointmentModel.Request request)
+    public async Task<IActionResult> CreateAppointment([FromBody] AppointmentModel.Request request)
     {
         var response = await _service.CreateAppointment(request);
         return Ok(response);
@@ -27,15 +27,6 @@ public class AppointmentController : AppController
     [HttpGet("patient")]
     public async Task<IActionResult> GetPatientAppointments([FromQuery] int dni)
     {
-        if (dni <= 0 || dni.ToString().Length < 7 || dni.ToString().Length > 10)
-        {
-            return BadRequest(new
-            {
-                errorCode = "INVALID_DNI",
-                message = "El DNI es obligatorio y debe tener entre 7 y 10 dígitos."
-            });
-        }
-
         var result = await _service.GetPatientAppointmentsAsync(dni);
         return Ok(result);
     }
