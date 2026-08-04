@@ -20,18 +20,7 @@ public class PatientController : AppController
     [HttpPut("profile")]
     public async Task<IActionResult> CompleteProfile(string dni, [FromBody] ProfileModel.Request request)
     {
-        try
-        {
-            await _service.CompleteProfileAsync(dni, request);
-            return Ok(new { message = "Perfil actualizado con éxito." });
-        }
-        catch (EntityNotFoundException ex)
-        {
-            return NotFound(new { message = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
+        await _service.CompleteProfileAsync(dni, request);
+        return Ok("Perfil actualizado con éxito.");
     }
 }
