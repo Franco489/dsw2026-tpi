@@ -58,7 +58,7 @@ public class AvailabilityService : IAvailabilityService
         return slots.ToList();
     }
 
-    public async Task CreateAvailabilitiesAsync(AvailabilityModel.Request request)
+    public async Task<AvailabilityModel.Response> CreateAvailabilitiesAsync(AvailabilityModel.Request request)
     {
         var doctor = await _persistence.GetById<Doctor>(request.DoctorId);
         if (doctor == null)
@@ -100,9 +100,11 @@ public class AvailabilityService : IAvailabilityService
         {
             await _persistence.AddRange(avaRules);
         }
+
+        return new AvailabilityModel.Response(doctor.Id, request.Days);
     }
 
-    public async Task UpdateAvailabilitiesAsync(AvailabilityModel.Request request)
+    public async Task<AvailabilityModel.Response> UpdateAvailabilitiesAsync(AvailabilityModel.Request request)
     {
         var availabilities = await _persistence.GetFiltered<Availability>((a => a.DoctorId == request.DoctorId), nameof(Availability.Slots));
 
@@ -142,5 +144,6 @@ public class AvailabilityService : IAvailabilityService
         {
             await _persistence.UpdateRange(availabilities.ToList());
         }
+        return new AvailabilityModel.Response(request.DoctorId, request.Days);
     }
 }
