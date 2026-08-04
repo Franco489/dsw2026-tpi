@@ -24,5 +24,5 @@ public record AppointmentModel
     public record DoctorDto(Guid Id, string Name, SpecialtyDto Specialty);
     public record SpecialtyDto(Guid Id, string Name);
     public record Response(Guid Id, AppointmentStatus Status, DateOnly Date, PatientDto Patient, DoctorDto Doctor);
-
+    public record ResponseDates(List<AppointmentModel.Response> response);
 }

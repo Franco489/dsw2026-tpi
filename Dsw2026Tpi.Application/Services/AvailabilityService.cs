@@ -3,6 +3,7 @@ using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.Application.Utils;
 using Dsw2026Tpi.Application.Validation;
 using Dsw2026Tpi.CrossCutting.Exceptions;
+using Dsw2026Tpi.CrossCutting.Resources;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
 using System;
@@ -60,10 +61,14 @@ public class AvailabilityService : IAvailabilityService
 
     public async Task CreateAvailabilitiesAsync(AvailabilityModel.Request request)
     {
-        var doctor = await _persistence.GetById<Doctor>(request.DoctorId);
+        var doctor = await _persistence.GetById<Doctor>(request.DoctorId, "AvailabilityRules");
         if (doctor == null)
         {
             throw new EntityNotFoundException($"No se encontró un doctor con el ID {request.DoctorId}");
+        }
+        if (doctor.AvailabilityRules.Count() > 0)
+        {
+            throw new ConflictException("El doctor ya tiene una disponibilidad definida. Intente actualizar la disponibilidad",nameof(ErrorCodes.AVAILABILITY_CONFLICT));
         }
         var actualDate = DateOnly.FromDateTime(DateTime.Now);
 
