@@ -1,13 +1,16 @@
 ﻿using Dsw2026Tpi.Application.Dtos;
 using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.Application.Services;
+using Dsw2026Tpi.CrossCutting.Exceptions;
+using Dsw2026Tpi.CrossCutting.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Dsw2026Tpi.CrossCutting.Exceptions;
 
 namespace Dsw2026Tpi.Api.Controllers;
 
 [Route("api/appointments")]
+[Authorize(Policy = Policies.PatientPolicy)]
 public class AppointmentController : AppController
 {
     private readonly IAppointmentService _service;
