@@ -28,6 +28,10 @@ public class AppointmentValidator
         {
             errores.Add(("availabilitySlotId", "El turno ya se encuentra reservado"));
         }
+        if (availabilitySlot is not null && availabilitySlot.Date.ToDateTime(availabilitySlot.StartTime) <= DateTime.Now)
+        {
+            errores.Add(("availabilitySlotId", "No se pueden reservar turnos en el pasado"));
+        }
         if (patient is null)
         { 
             errores.Add(("patient.dni", "No existe un paciente con ese DNI"));
@@ -55,9 +59,9 @@ public class AppointmentValidator
         { 
             errores.Add(("Appointment", "La cita no existe")); 
         }
-        else if (appointment.CancelledAt != null)
+        else if (appointment.Status != AppointmentStatus.BOOKED)
         {
-            errores.Add(("Appointment", "La cita ya fue cancelada"));
+            errores.Add(("Appointment", "Solo se puede cancelar un turno en estado BOOKED"));
         }
         if (errores.Any())
         {
