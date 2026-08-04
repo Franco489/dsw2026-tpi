@@ -93,18 +93,23 @@ public class AppointmentService : IAppointmentService
         await _persistence.Update<Appointment>(appointment);
     }
 
-    public async Task<AppointmentModel.Response> GetAppointmentsByDate (DateOnly date)
+    public async Task<AppointmentModel.ResponseDates> GetAppointmentsByDate (DateOnly date)
     {
-        var appointment = await _persistence.First<Appointment>(a => a.AvailabilitySlot.Date == date, "Patient", "AvailabilitySlot"
+        var appointments = await _persistence.GetFiltered<Appointment>(a => a.AvailabilitySlot.Date == date, "Patient", "AvailabilitySlot"
             , "AvailabilitySlot.Availability", "AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Speciality");
-        if (appointment == null)
+        if (!appointments.Any())
         {
             throw new EntityNotFoundException($"No existe el turno con fecha {date}");
         }
-        return new AppointmentModel.Response(appointment.Id, appointment.Status, appointment.AvailabilitySlot.Date,
-                    new AppointmentModel.PatientDto(appointment.Patient.Dni, appointment.Patient.Name),
-                    new AppointmentModel.DoctorDto(appointment.AvailabilitySlot.DoctorId, appointment.AvailabilitySlot.Availability.Doctor.Name,
-                    new AppointmentModel.SpecialtyDto(appointment.AvailabilitySlot.Availability.Doctor.SpecialityId, appointment.AvailabilitySlot.Availability.Doctor.Speciality.Name)));
+        var response = new List<AppointmentModel.Response>();
+        foreach (var a in appointments)
+        {
+            response.Add(new AppointmentModel.Response(a.Id, a.Status, a.AvailabilitySlot.Date,
+                    new AppointmentModel.PatientDto(a.Patient.Dni, a.Patient.Name),
+                    new AppointmentModel.DoctorDto(a.AvailabilitySlot.DoctorId, a.AvailabilitySlot.Availability.Doctor.Name,
+                    new AppointmentModel.SpecialtyDto(a.AvailabilitySlot.Availability.Doctor.SpecialityId, a.AvailabilitySlot.Availability.Doctor.Speciality.Name))));
+        }
+        return new AppointmentModel.ResponseDates(response);
     }
 
     // búsqueda combinada de turnos
