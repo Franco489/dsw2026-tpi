@@ -62,8 +62,8 @@ public class AuthenticationService : IAuthenticationService
     {
         if (!request.Email.IsEmailValid() || !request.Dni.IsDniValid()) 
         {
-            throw new ValidationException(ErrorCodes.REGISTER_USER_INVALID,
-            nameof(ErrorCodes.REGISTER_USER_INVALID)); 
+            throw new ValidationException(ErrorCodes.LOGIN_USER_INVALID,
+            nameof(ErrorCodes.LOGIN_USER_INVALID)); 
         }
         var patient = await _persistence.First<Patient>(p => p.Dni == request.Dni);
 

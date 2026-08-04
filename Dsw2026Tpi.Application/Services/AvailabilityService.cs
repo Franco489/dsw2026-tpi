@@ -64,11 +64,11 @@ public class AvailabilityService : IAvailabilityService
         var doctor = await _persistence.GetById<Doctor>(request.DoctorId, "AvailabilityRules");
         if (doctor == null)
         {
-            throw new EntityNotFoundException($"No se encontró un doctor con el ID {request.DoctorId}");
+            throw new EntityNotFoundException(request.DoctorId.ToString());
         }
         if (doctor.AvailabilityRules.Count() > 0)
         {
-            throw new ConflictException("El doctor ya tiene una disponibilidad definida. Intente actualizar la disponibilidad",nameof(ErrorCodes.AVAILABILITY_CONFLICT));
+            throw new ConflictException(nameof(ErrorCodes.AVAILABILITY_CONFLICT), ErrorCodes.AVAILABILITY_CONFLICT);
         }
         var actualDate = DateOnly.FromDateTime(DateTime.Now);
 
@@ -81,7 +81,7 @@ public class AvailabilityService : IAvailabilityService
             if (daySchedule.EndTime < daySchedule.StartTime.AddMinutes(30))
             {
                 throw new ArgumentOutOfRangeException("El horario de inicio debe ser 30 minutos menor al horario de fin.");
-            }//TODO: llevar esta validación a un hhelper.
+            }
             var dayOfWeek = daySchedule.Day.toDayOfWeek();
             var avaRule = new Availability
             {

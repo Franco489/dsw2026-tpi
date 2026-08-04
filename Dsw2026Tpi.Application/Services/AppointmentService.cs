@@ -46,24 +46,21 @@ public class AppointmentService : IAppointmentService
         }
         catch (DbUpdateConcurrencyException Cex) 
         {
-            throw new ConflictException(nameof(ErrorCodes.APPOINTMENT_CONFLICT), "Este turno ya se encuentra reservado.");
+            throw new ConflictException(nameof(ErrorCodes.APPOINTMENT_CONFLICT), ErrorCodes.APPOINTMENT_CONFLICT);
         }
         
-
         return new AppointmentModel.Response(newAppoiment.Id, newAppoiment.Status, availabilitySlot.Date,
             new AppointmentModel.PatientDto(patient.Dni, patient.Name),
             new AppointmentModel.DoctorDto(doctor.Id, doctor.Name,
                 new AppointmentModel.SpecialtyDto(doctor.Speciality.Id, doctor.Speciality.Name))
         );
     }
-
-    // ver turnos activos del paciente
     public async Task<IEnumerable<AppointmentModel.Response>> GetPatientAppointmentsAsync(string dni)
     {
         var patient = await _persistence.First<Patient>(p => p.Dni.Equals(dni));
         if (patient == null)
         {
-            throw new EntityNotFoundException($"No existe el paciente con DNI {dni}");
+            throw new EntityNotFoundException(dni);
         }
 
         List<AppointmentModel.Response> result = [];
@@ -99,7 +96,7 @@ public class AppointmentService : IAppointmentService
             , "AvailabilitySlot.Availability", "AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Speciality");
         if (!appointments.Any())
         {
-            throw new EntityNotFoundException($"No existe el turno con fecha {date}");
+            throw new EntityNotFoundException(nameof(Appointment));
         }
         var response = new List<AppointmentModel.Response>();
         foreach (var a in appointments)
