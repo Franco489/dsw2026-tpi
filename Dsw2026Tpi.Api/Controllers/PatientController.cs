@@ -9,8 +9,6 @@ using Microsoft.JSInterop.Infrastructure;
 namespace Dsw2026Tpi.Api.Controllers;
 
 [Route("api/patient")]
-
-[Authorize(Policy = Policies.AdminPolicy)]
 public class PatientController : AppController
 {
     private readonly IPatientService _service;
@@ -25,7 +23,7 @@ public class PatientController : AppController
         try
         {
             await _service.CompleteProfileAsync(dni, request);
-            return Ok(new { message = "El perfil del paciente se actualizó con éxito." });
+            return Ok(new { message = "Perfil actualizado con éxito." });
         }
         catch (EntityNotFoundException ex)
         {

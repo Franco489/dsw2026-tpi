@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.RateLimiting;
 namespace Dsw2026Tpi.Api.Controllers;
 
 [Route("api/appointments")]
-[Authorize(Policy = Policies.PatientPolicy)]
 public class AppointmentController : AppController
 {
     private readonly IAppointmentService _service;
@@ -28,7 +27,6 @@ public class AppointmentController : AppController
         return Ok(response);
     }
 
-    //ver los turnos del paciente
     [HttpGet("patient")]
     public async Task<IActionResult> GetPatientAppointments([FromQuery] string dni)
     {
@@ -45,6 +43,7 @@ public class AppointmentController : AppController
 
 
     [HttpGet]
+    [Authorize(Policy = Policies.PatientPolicy)]
     public async Task<IActionResult> GetAppointmentsByDate([FromQuery] DateOnly date)
     {
         var result = await _service.GetAppointmentsByDate(date);
@@ -53,6 +52,7 @@ public class AppointmentController : AppController
 
 
     [HttpGet("search")]
+    [Authorize(Policy = Policies.PatientPolicy)]
     public async Task<IActionResult> SearchAppointments([FromQuery] Guid? specialtyId,[FromQuery] Guid? doctorId,[FromQuery] string? dni, [FromQuery] DateOnly? date, [FromQuery] int pageSize = 10, [FromQuery] int pageIndex = 0)
     {
         var result = await _service.CombinedSearch(pageSize,pageIndex,specialtyId, doctorId, dni, date);

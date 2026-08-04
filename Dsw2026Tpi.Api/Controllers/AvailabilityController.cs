@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dsw2026Tpi.Api.Controllers;
 
 [Route("api/availabilities")]
-
 [Authorize(Policy = Policies.AdminPolicy)]
 public class AvailabilityController : AppController
 {

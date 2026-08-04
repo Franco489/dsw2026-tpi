@@ -7,8 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dsw2026Tpi.Api.Controllers;
 
 [Route("api/doctors")]
-
-[Authorize(Policy = Policies.AdminPolicy)]
 public class DoctorController : AppController
 {
     private readonly IDoctorService _service;
@@ -19,7 +17,7 @@ public class DoctorController : AppController
     }
 
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)] //TODO: Esto no hace falta, verda?
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll([FromQuery]int pageSize = 10, [FromQuery]int pageIndex = 0, [FromQuery]string? name = null)
     {
         var doctors = await _service.GetAll(pageSize, pageIndex, name);
@@ -27,7 +25,6 @@ public class DoctorController : AppController
     }
 
     [HttpGet("{id}/availabilities")]
-
     public async Task<IActionResult> GetAvailabilities([FromRoute] Guid id, [FromQuery] int pageSize = 10, [FromQuery] int pageIndex = 0)
     {
         var availabilities = await _service.GetAvailabilities(id, pageSize, pageIndex);
@@ -36,6 +33,7 @@ public class DoctorController : AppController
 
 
     [HttpPost]
+    [Authorize(Policy = Policies.AdminPolicy)]
     public async Task<IActionResult> CreateDoctor(DoctorModel.Request request)
     {
         var doctor = await _service.CreateDoctor(request);
@@ -44,6 +42,7 @@ public class DoctorController : AppController
 
 
     [HttpPut("{id}")]
+    [Authorize(Policy = Policies.AdminPolicy)]
     public async Task<IActionResult> UpdateDoctor(Guid id, DoctorModel.Request request)
     {
         var doctor = await _service.UpdateDoctor(id, request);
@@ -51,6 +50,7 @@ public class DoctorController : AppController
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Policy = Policies.AdminPolicy)]
     public async Task<IActionResult> DeleteDoctor([FromRoute] Guid id)
     {
         await _service.DeleteDoctor(id);
@@ -58,6 +58,7 @@ public class DoctorController : AppController
     }
 
     [HttpPut("activate")]
+    [Authorize(Policy = Policies.AdminPolicy)]
     public async Task<IActionResult> ReactivateDoctor([FromQuery] Guid id)
     {
         await _service.ReactivateDoctor(id);
