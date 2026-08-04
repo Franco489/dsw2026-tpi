@@ -2,6 +2,8 @@
 using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.Application.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using Dsw2026Tpi.CrossCutting.Exceptions;
 
 namespace Dsw2026Tpi.Api.Controllers;
 
@@ -16,7 +18,8 @@ public class AppointmentController : AppController
     }
 
    [HttpPost]
-   public async Task<IActionResult> createAppointment([FromBody] AppointmentModel.Request request)
+   [EnableRateLimiting("BookingPolicy")]
+    public async Task<IActionResult> CreateAppointment([FromBody] AppointmentModel.Request request)
     {
         var response = await _service.CreateAppointment(request);
         return Ok(response);
@@ -26,15 +29,6 @@ public class AppointmentController : AppController
     [HttpGet("patient")]
     public async Task<IActionResult> GetPatientAppointments([FromQuery] int dni)
     {
-        if (dni <= 0 || dni.ToString().Length < 7 || dni.ToString().Length > 10)
-        {
-            return BadRequest(new
-            {
-                errorCode = "INVALID_DNI",
-                message = "El DNI es obligatorio y debe tener entre 7 y 10 dígitos."
-            }); //TODO: ESTOI NO VA A ACAAAAAAAAAAAAAAAAAA
-        }
-
         var result = await _service.GetPatientAppointmentsAsync(dni);
         return Ok(result);
     }

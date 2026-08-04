@@ -92,8 +92,6 @@ public class AuthenticationService : IAuthenticationService
                 await _userManager.AddToRoleAsync(user, Roles.Patient);
             }
             await _persistence.Add(new Patient { UserId = Guid.Parse(user.Id), Email = request.Email, Dni = request.Dni});
-            //TODO: Haciendo este endpoint me di cuenta de que name y phonenumber estan al 2pe. Deberíamos cambiar el dto? O lo dejamos en dni y email?
-            //Podemos hacer un endpoint tipo "completar registro" en donde el paciente ingresa esos datos
             _logger.LogInformation("Entidad paciente registrada: {Dni}", request.Dni);
         }
         else 

@@ -6,11 +6,12 @@ using System.Text;
 
 namespace Dsw2026Tpi.Application.Interfaces;
 
-public interface IAppointmentService 
+public interface IAppointmentService
 {
     Task<AppointmentModel.Response> CreateAppointment(AppointmentModel.Request request);
     Task<IEnumerable<AppointmentModel.Response>> GetPatientAppointmentsAsync(int dni);
     Task CancelAppointmentAsync(Guid id);
     Task<AppointmentModel.Response> GetAppointmentsByDate(DateOnly date);
-    Task<Pagination<AppointmentModel.Response>> CombinedSearch(int pageSize, int pageIndex, Guid? specialtyId, Guid? doctorId, string dni, DateOnly? date);
+    Task<Pagination<AppointmentModel.Response>> CombinedSearch(int pageSize, int pageIndex, Guid? specialtyId, Guid? doctorId, string? dni, DateOnly? date);
+
 }
