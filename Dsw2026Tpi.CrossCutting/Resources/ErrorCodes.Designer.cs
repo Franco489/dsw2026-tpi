@@ -61,6 +61,24 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to El turno ya fue reservado.
+        /// </summary>
+        public static string APPOINTMENT_CONFLICT {
+            get {
+                return ResourceManager.GetString("APPOINTMENT_CONFLICT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Se encontraron errores en los datos ingresados..
+        /// </summary>
+        public static string APPOINTMENT_ERROR {
+            get {
+                return ResourceManager.GetString("APPOINTMENT_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Usuario o contraseña incorrectos.
         /// </summary>
         public static string AUTHENTICATION_FAILED {

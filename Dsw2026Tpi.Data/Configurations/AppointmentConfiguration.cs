@@ -14,6 +14,7 @@ namespace Dsw2026Tpi.Data.Configuration
             builder.ToTable("Appointments");
             builder.Property(a => a.Status).HasMaxLength(20);
             builder.Property(a => a.Reason).HasMaxLength(300);
+            builder.HasIndex(a => a.AvailabilitySlotId).IsUnique();
         }
     }
 }

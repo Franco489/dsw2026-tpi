@@ -40,7 +40,7 @@ namespace Dsw2026Tpi.Api.Controllers
             return Ok();
         }
 
-        [HttpPut("/activate")]
+        [HttpPut("activate")]
         public async Task<IActionResult> ReactivateSpeciality([FromQuery] Guid id)
         {
             await _service.ReactivateSpeciality(id);

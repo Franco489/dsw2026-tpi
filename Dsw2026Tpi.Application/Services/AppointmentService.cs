@@ -2,8 +2,10 @@
 using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.Application.Validation;
 using Dsw2026Tpi.CrossCutting.Exceptions;
+using Dsw2026Tpi.CrossCutting.Resources;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;
 using System.Collections.Generic;
@@ -38,8 +40,15 @@ public class AppointmentService : IAppointmentService
             AvailabilitySlot = availabilitySlot,
             AvailabilitySlotId = availabilitySlot.Id,
         };
-
-        await _persistence.Add(newAppoiment);
+        try
+        {
+            await _persistence.Add(newAppoiment);
+        }
+        catch (DbUpdateConcurrencyException Cex) 
+        {
+            throw new ConflictException(nameof(ErrorCodes.APPOINTMENT_CONFLICT), "Este turno ya se encuentra reservado.");
+        }
+        
 
         return new AppointmentModel.Response(newAppoiment.Id, newAppoiment.Status, availabilitySlot.Date,
             new AppointmentModel.PatientDto(patient.Dni, patient.Name),
@@ -49,9 +58,9 @@ public class AppointmentService : IAppointmentService
     }
 
     // ver turnos activos del paciente
-    public async Task<IEnumerable<AppointmentModel.Response>> GetPatientAppointmentsAsync(int dni)
+    public async Task<IEnumerable<AppointmentModel.Response>> GetPatientAppointmentsAsync(string dni)
     {
-        var patient = await _persistence.First<Patient>(p => p.Dni == dni.ToString());
+        var patient = await _persistence.First<Patient>(p => p.Dni.Equals(dni));
         if (patient == null)
         {
             throw new EntityNotFoundException($"No existe el paciente con DNI {dni}");

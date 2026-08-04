@@ -26,7 +26,7 @@ public class AppointmentController : AppController
     }
     //ver los turnos del paciente
     [HttpGet("patient")]
-    public async Task<IActionResult> GetPatientAppointments([FromQuery] int dni)
+    public async Task<IActionResult> GetPatientAppointments([FromQuery] string dni)
     {
         var result = await _service.GetPatientAppointmentsAsync(dni);
         return Ok(result);
