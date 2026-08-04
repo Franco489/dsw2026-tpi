@@ -49,7 +49,7 @@ public class AppointmentService : IAppointmentService
             throw new ConflictException(nameof(ErrorCodes.APPOINTMENT_CONFLICT), ErrorCodes.APPOINTMENT_CONFLICT);
         }
         
-        return new AppointmentModel.Response(newAppoiment.Id, newAppoiment.Status, availabilitySlot.Date,
+        return new AppointmentModel.Response(newAppoiment.Id, newAppoiment.Status.ToString(), availabilitySlot.Date,
             new AppointmentModel.PatientDto(patient.Dni, patient.Name),
             new AppointmentModel.DoctorDto(doctor.Id, doctor.Name,
                 new AppointmentModel.SpecialtyDto(doctor.Speciality.Id, doctor.Speciality.Name))
@@ -71,7 +71,7 @@ public class AppointmentService : IAppointmentService
         {
             result.Add(new AppointmentModel.Response
             (
-                a.Id, a.Status, a.AvailabilitySlot.Date,
+                a.Id, a.Status.ToString(), a.AvailabilitySlot.Date,
                 new AppointmentModel.PatientDto(a.Patient.Dni, a.Patient.Name),
                 new AppointmentModel.DoctorDto(a.AvailabilitySlot.DoctorId, a.AvailabilitySlot.Availability.Doctor.Name,
                     new AppointmentModel.SpecialtyDto(a.AvailabilitySlot.Availability.Doctor.SpecialityId, a.AvailabilitySlot.Availability.Doctor.Speciality.Name))
@@ -101,7 +101,7 @@ public class AppointmentService : IAppointmentService
         var response = new List<AppointmentModel.Response>();
         foreach (var a in appointments)
         {
-            response.Add(new AppointmentModel.Response(a.Id, a.Status, a.AvailabilitySlot.Date,
+            response.Add(new AppointmentModel.Response(a.Id, a.Status.ToString(), a.AvailabilitySlot.Date,
                     new AppointmentModel.PatientDto(a.Patient.Dni, a.Patient.Name),
                     new AppointmentModel.DoctorDto(a.AvailabilitySlot.DoctorId, a.AvailabilitySlot.Availability.Doctor.Name,
                     new AppointmentModel.SpecialtyDto(a.AvailabilitySlot.Availability.Doctor.SpecialityId, a.AvailabilitySlot.Availability.Doctor.Speciality.Name))));
@@ -124,7 +124,7 @@ public class AppointmentService : IAppointmentService
             r => r.Patient.Dni, "Patient", "AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Speciality"
         );
 
-        return response.Map(r => new AppointmentModel.Response(r.Id, r.Status, r.AvailabilitySlot.Date,
+        return response.Map(r => new AppointmentModel.Response(r.Id, r.Status.ToString(), r.AvailabilitySlot.Date,
             new AppointmentModel.PatientDto(r.Patient.Dni, r.Patient.Name),
             new AppointmentModel.DoctorDto(r.AvailabilitySlot.DoctorId, r.AvailabilitySlot.Availability.Doctor.Name,
                 new AppointmentModel.SpecialtyDto(r.AvailabilitySlot.Availability.Doctor.SpecialityId, r.AvailabilitySlot.Availability.Doctor.Speciality.Name)))
