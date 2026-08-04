@@ -29,6 +29,7 @@ public class Program
             builder.Services.AddApplicationPersistence(builder.Configuration);
             builder.Services.AddAppCors(builder.Configuration);
             builder.Services.AddAppDependencies();
+            builder.Services.AddCustomRateLimiting(builder.Configuration);
             builder.Services.AddControllers();
             builder.Services.AddHealthChecks();
 
@@ -50,11 +51,13 @@ public class Program
                     await app.SeedAdminAsync();
                 } 
             }
-
+            app.UseRouting();
+            app.UseRateLimiter();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseCors();
             app.UseMiddleware<ExceptionHandlingMiddleware>();
+            app.UseCors();
+           
 
             app.MapControllers();
             app.MapHealthChecks("/health-check");
