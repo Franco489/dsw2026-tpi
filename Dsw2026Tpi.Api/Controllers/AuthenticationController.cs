@@ -25,7 +25,7 @@ public class AuthenticationController : AppController
     }
 
     [HttpPost("admin/login")]
-    [EnableRateLimiting("AdminloginPolicy")]
+    [EnableRateLimiting("AdminLoginPolicy")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> LoginAdmin([FromBody] LoginAdminModel.Request request)
