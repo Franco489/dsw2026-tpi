@@ -23,6 +23,7 @@ namespace Dsw2026Tpi.Data.Configuration
             builder.Property(a => a.StartTime).IsRequired();
             builder.Property(a => a.EndTime).IsRequired();
             builder.Property(a => a.Status).HasMaxLength(20);
+            builder.Property(a => a.RowVersion).IsRowVersion();
         }
     }
 }

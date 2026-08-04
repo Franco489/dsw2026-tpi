@@ -13,6 +13,7 @@ namespace Dsw2026Tpi.Domain.Entities
         public Availability Availability { get; set; }
         public Guid AvailabilityId { get; set; }
         public Guid DoctorId { get; set; }
+        public byte[] RowVersion { get; set; }
 
         public void Book()
         {

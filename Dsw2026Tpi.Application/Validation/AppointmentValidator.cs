@@ -24,9 +24,9 @@ public class AppointmentValidator
         {
             errores.Add(("availabilitySlotId", "No existe un slot asociado a ese ID"));
         }
-        else if (availabilitySlot.Status == AvailabilitySlotStatus.BOOKED)
+        else if (availabilitySlot.Status != AvailabilitySlotStatus.AVAILABLE)
         {
-            errores.Add(("availabilitySlotId", "El turno ya se encuentra reservado"));
+            errores.Add(("availabilitySlotId", "El turno no se encuentra disponible"));
         }
         if (availabilitySlot is not null && availabilitySlot.Date.ToDateTime(availabilitySlot.StartTime) <= DateTime.Now)
         {
