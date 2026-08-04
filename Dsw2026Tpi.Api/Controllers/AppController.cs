@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2026Tpi.Api.Controllers;
@@ -6,7 +7,7 @@ namespace Dsw2026Tpi.Api.Controllers;
 /// Clase base para configuraciones generales de controladores
 /// </summary>
 [ApiController]
-[Route("api")]
+[Authorize]
 public abstract class AppController : ControllerBase
 {
 }

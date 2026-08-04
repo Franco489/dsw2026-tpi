@@ -38,7 +38,7 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<LoginAdminModel.Response> LoginAdmin(LoginAdminModel.Request request)
     {
-        if (!request.Email.IsEmailValid()) throw new AuthenticationException();
+        if (!request.Email.IsEmailValid()) throw new ValidationException();
         var user = await _userManager.FindByEmailAsync(request.Email) ?? throw new AuthenticationException();
         var result = await _signInManager.CheckPassword(user, request.Password);
 
@@ -48,9 +48,7 @@ public class AuthenticationService : IAuthenticationService
             throw new AuthenticationException();
         }
 
-        var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault(); //Esto es innecesario? ya que este método es solo para admins
-                                                                              //(en un principio era "login" no sé si la intención era hacerlo genérico.
-                                                                              //Pero al ser un toq distinto el procedimiento no sé si vale la pena)
+        var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault(); 
 
         var token  = _jwtService.GenerateToken(user.UserName!, role);
 
@@ -64,8 +62,8 @@ public class AuthenticationService : IAuthenticationService
     {
         if (!request.Email.IsEmailValid() || !request.Dni.IsDniValid()) 
         {
-            throw new ValidationException(ErrorCodes.REGISTER_USER_INVALID,
-            nameof(ErrorCodes.REGISTER_USER_INVALID)); //TODO: Helper/validator?
+            throw new ValidationException(ErrorCodes.LOGIN_USER_INVALID,
+            nameof(ErrorCodes.LOGIN_USER_INVALID)); 
         }
         var patient = await _persistence.First<Patient>(p => p.Dni == request.Dni);
 
@@ -101,7 +99,7 @@ public class AuthenticationService : IAuthenticationService
                 _logger.LogWarning("El Email no coincide con el DNI proporcionado: {Email}", request.Email);
                 throw new AuthenticationException();
             }
-            //OrdinalIgnoreCase para ignorar mayus y min, ademas para evitar conflictos de lenguaje (cultura)
+            
         }
         var token = _jwtService.GenerateToken(request.Dni, Roles.Patient);
         return new LoginPatientModel.Response(token, Roles.Patient);

@@ -135,6 +135,9 @@
   <data name="ENTITY_NOTFOUND" xml:space="preserve">
     <value>La entidad {0} no se encontró</value>
   </data>
+  <data name="LOGIN_USER_INVALID" xml:space="preserve">
+    <value>Datos de inicio de sesión no válidos</value>
+  </data>
   <data name="REGISTER_USER_CONFLICT" xml:space="preserve">
     <value>Se produjo un error al registrar el usuario</value>
   </data>

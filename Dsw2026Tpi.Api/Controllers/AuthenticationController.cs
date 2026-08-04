@@ -1,5 +1,7 @@
 ﻿using Dsw2026Tpi.Application.Dtos;
 using Dsw2026Tpi.Application.Interfaces;
+using Dsw2026Tpi.CrossCutting.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
@@ -16,8 +18,9 @@ public class AuthenticationController : AppController
     }
 
     [HttpPost("admin/register")]
-    //[ProducesResponseType(StatusCodes.Status200OK)]
-    //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Policy = Policies.AdminPolicy)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterModel.Request request)
     {
         var result = await _authenticationService.Register(request);
@@ -25,6 +28,7 @@ public class AuthenticationController : AppController
     }
 
     [HttpPost("admin/login")]
+    [AllowAnonymous]
     [EnableRateLimiting("AdminLoginPolicy")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -34,9 +38,10 @@ public class AuthenticationController : AppController
         return Ok(result);
     }
     [HttpPost("patient/login")]
+    [AllowAnonymous]
     [EnableRateLimiting("PatientLoginPolicy")]
-    //[ProducesResponseType(StatusCodes.Status200OK)]
-    //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> LoginPatient([FromBody] LoginPatientModel.Request request)
     {
         var result = await _authenticationService.LoginPatient(request);
