@@ -16,12 +16,13 @@ public class AvailabilityController : AppController
     }
     
     [HttpPost]
-
     public async Task<IActionResult> CreateAvailabilities([FromBody] AvailabilityModel.Request request)
     {
         await _service.CreateAvailabilitiesAsync(request);
         return Ok(request);
     }
+
+
     [HttpPut]
     public async Task<IActionResult> UpdateAvailabilities([FromBody] AvailabilityModel.Request request)
     {

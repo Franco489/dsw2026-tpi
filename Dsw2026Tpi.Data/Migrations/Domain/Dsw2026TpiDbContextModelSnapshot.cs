@@ -278,7 +278,7 @@ namespace Dsw2026Tpi.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("Dsw2026Tpi.Domain.Entities.Patient", "Patient")
-                        .WithMany()
+                        .WithMany("Appointments")
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -329,6 +329,11 @@ namespace Dsw2026Tpi.Data.Migrations
             modelBuilder.Entity("Dsw2026Tpi.Domain.Entities.Doctor", b =>
                 {
                     b.Navigation("AvailabilityRules");
+                });
+
+            modelBuilder.Entity("Dsw2026Tpi.Domain.Entities.Patient", b =>
+                {
+                    b.Navigation("Appointments");
                 });
 #pragma warning restore 612, 618
         }

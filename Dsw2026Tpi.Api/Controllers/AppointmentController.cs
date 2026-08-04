@@ -24,6 +24,7 @@ public class AppointmentController : AppController
         var response = await _service.CreateAppointment(request);
         return Ok(response);
     }
+
     //ver los turnos del paciente
     [HttpGet("patient")]
     public async Task<IActionResult> GetPatientAppointments([FromQuery] int dni)
@@ -38,6 +39,15 @@ public class AppointmentController : AppController
       await _service.CancelAppointmentAsync(id);
       return Ok("ok");
     }
+
+
+    [HttpGet]
+    public async Task<IActionResult> GetAppointmentsByDate([FromQuery] DateOnly date)
+    {
+        var result = await _service.GetAppointmentsByDate(date);
+        return Ok(result);
+    }
+
 
     [HttpGet("search")]
     public async Task<IActionResult> SearchAppointments([FromQuery] Guid? specialtyId,[FromQuery] Guid? doctorId,[FromQuery] string? dni, [FromQuery] DateOnly? date, [FromQuery] int pageSize = 10, [FromQuery] int pageIndex = 0)
