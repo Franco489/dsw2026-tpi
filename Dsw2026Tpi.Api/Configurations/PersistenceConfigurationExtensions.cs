@@ -15,12 +15,12 @@ public static class PersistenceConfigurationExtensions
         IConfiguration configuration)
     {
         //Obtener cadena de conexión desde appsettings.json
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var connectionString = configuration.GetConnectionString("PostgreSql");
 
         //Agregar contexto (O/RM) y utilizar SQL Server para DB
         services.AddDbContext<Dsw2026TpiDbContext>(options =>
         {
-            options.UseSqlServer(connectionString);
+            options.UseNpgsql(connectionString);
             options.UseSeeding((c, t) =>
             {
                 c.Seedwork<Speciality>("specialities");
@@ -30,8 +30,7 @@ public static class PersistenceConfigurationExtensions
 
         services.AddDbContext<AuthenticationDbContext>(options =>
         {
-            options.UseSqlServer(connectionString, 
-                config => config.MigrationsHistoryTable("__EFMigrationsHistory_Auth"));
+            options.UseNpgsql(connectionString);
             options.UseSeeding((c, t) =>
             {
                 c.Seedwork<IdentityRole>("roles");
