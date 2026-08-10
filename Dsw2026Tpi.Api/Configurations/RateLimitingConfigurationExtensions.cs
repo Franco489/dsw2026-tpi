@@ -11,7 +11,6 @@ public static class RateLimitingConfigurationExtensions
         {
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
-            // Formato de error y loggeo exigido por el TP
             options.OnRejected = async (context, token) =>
             {
                 var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
@@ -31,7 +30,6 @@ public static class RateLimitingConfigurationExtensions
                     token);
             };
 
-            // 1. Límite Global (100 peticiones x IP)
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
                 RateLimitPartition.GetFixedWindowLimiter(
                     partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
@@ -43,7 +41,7 @@ public static class RateLimitingConfigurationExtensions
                         Window = config.GetValue<TimeSpan>("RateLimiting:Global:Window")
                     }));
 
-            // 2. Política de Login Admin (5 x IP)
+          
             options.AddPolicy("AdminLoginPolicy", httpContext =>
                 RateLimitPartition.GetFixedWindowLimiter(
                     partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
@@ -55,7 +53,6 @@ public static class RateLimitingConfigurationExtensions
                         Window = config.GetValue<TimeSpan>("RateLimiting:AdminLogin:Window")
                     }));
 
-            // 3. Política de Login Paciente (10 x IP)
             options.AddPolicy("PatientLoginPolicy", httpContext =>
                 RateLimitPartition.GetFixedWindowLimiter(
                     partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
@@ -67,10 +64,9 @@ public static class RateLimitingConfigurationExtensions
                         Window = config.GetValue<TimeSpan>("RateLimiting:PatientLogin:Window")
                     }));
 
-            // 4. Política de Reserva de Turnos (5 x Paciente autenticado o IP)
             options.AddPolicy("BookingPolicy", httpContext =>
                 RateLimitPartition.GetFixedWindowLimiter(
-                    // Toma el nombre del Claim (Dni/Email) si está logueado, sino usa la IP
+                   
                     partitionKey: httpContext.User.Identity?.Name ?? httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
                     factory: partition => new FixedWindowRateLimiterOptions
                     {

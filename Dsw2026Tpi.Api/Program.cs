@@ -22,6 +22,7 @@ public class Program
             var builder = WebApplication.CreateBuilder(args);
 
             //Configuraciones personalizadas
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
             builder.AddSerilogConfiguration();
             builder.Services.AddAppIdentity();
             builder.Services.AddAppAuthentication(builder.Configuration);
