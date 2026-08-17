@@ -50,11 +50,16 @@ public class AuthenticationService : IAuthenticationService
 
         var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault(); 
 
+        if (role != Roles.Administrator)
+        {
+            throw new AuthenticationException();
+        }
+
         var token  = _jwtService.GenerateToken(user.UserName!, role);
 
         return new LoginAdminModel.Response(
             token,
-            role
+            role.ToUpper()
         );
     }
 
