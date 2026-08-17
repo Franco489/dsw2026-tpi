@@ -25,9 +25,9 @@ public class DoctorController : AppController
     }
 
     [HttpGet("{id}/availabilities")]
-    public async Task<IActionResult> GetAvailabilities([FromRoute] Guid id, [FromQuery] int pageSize = 10, [FromQuery] int pageIndex = 0)
+    public async Task<IActionResult> GetAvailabilities([FromRoute] Guid id)
     {
-        var availabilities = await _service.GetAvailabilities(id, pageSize, pageIndex);
+        var availabilities = await _service.GetAvailabilities(id);
         return Ok(availabilities);
     }
 

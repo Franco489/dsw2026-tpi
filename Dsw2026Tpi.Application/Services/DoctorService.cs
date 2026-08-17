@@ -2,6 +2,7 @@
 using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.Application.Validation;
 using Dsw2026Tpi.CrossCutting.Exceptions;
+using Dsw2026Tpi.CrossCutting.Resources;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
 
@@ -26,17 +27,31 @@ public class DoctorService : IDoctorService
     }
 
 
-    public async Task<Pagination<AvailabilityModel.DayScheduleResponse  >> GetAvailabilities(Guid id, int pageSize, int pageIndex)
+    public async Task<List<AvailabilityModel.DayScheduleResponse>> GetAvailabilities(Guid id)
     {
-        var doctor = await _persistence.GetById<Doctor>(id);
+        var doctor = await _persistence.GetById<Doctor>(id, "AvailabilityRules", "AvailabilityRules.Slots");
         if (doctor == null)
         {
             throw new EntityNotFoundException(nameof(Doctor));
         }
+        if (doctor.AvailabilityRules is null)
+        {
+            return new List<AvailabilityModel.DayScheduleResponse>();
+        }
 
-        var slots = await _persistence.Paginate<AvailabilitySlot, DateOnly>(pageSize, pageIndex,
-                                                                   s => s.Availability.DoctorId == id && s.Status == 0 && s.Date >= DateOnly.FromDateTime(DateTime.Now), s => s.Date);
-        return slots.Map(s => new AvailabilityModel.DayScheduleResponse(s.Id, s.Date.ToString("dd/MM/yyyy"), s.StartTime, s.EndTime));
+        var availabilities = new List<AvailabilityModel.DayScheduleResponse>();
+
+        foreach (var rule in doctor.AvailabilityRules)
+        {
+            foreach (var slot in rule.Slots)
+            {
+                var dto = new AvailabilityModel.DayScheduleResponse(slot.Id, slot.Date.ToShortDateString() , slot.StartTime, slot.EndTime);
+                availabilities.Add(dto);
+               
+            }
+        }
+
+        return availabilities;
     }
 
     public async Task<DoctorModel.Response> CreateDoctor(DoctorModel.Request request)
