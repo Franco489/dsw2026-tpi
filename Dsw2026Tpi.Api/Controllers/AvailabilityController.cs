@@ -30,8 +30,8 @@ public class AvailabilityController : AppController
 
     public async Task<IActionResult> UpdateAvailabilities([FromBody] AvailabilityModel.Request request)
     {
-        var availability = await _service.UpdateAvailabilitiesAsync(request);
-        return Ok(availability);
+        var response = await _service.UpdateAvailabilitiesAsync(request);
+        return Ok(response);
     }
 
 }

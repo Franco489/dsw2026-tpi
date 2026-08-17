@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
 using static Dsw2026Tpi.Application.Dtos.AvailabilityModel;
 
@@ -111,44 +112,49 @@ public class AvailabilityService : IAvailabilityService
 
     public async Task<AvailabilityModel.Response> UpdateAvailabilitiesAsync(AvailabilityModel.Request request)
     {
-        var availabilities = await _persistence.GetFiltered<Availability>((a => a.DoctorId == request.DoctorId), nameof(Availability.Slots));
+        var availabilities = await _persistence.GetFiltered<Availability>(
+            a => a.DoctorId == request.DoctorId, nameof(Availability.Slots));
 
-        if (!availabilities.Any()) 
-        {
-            throw new EntityNotFoundException($"No se encontraron disponibilidades asociadas a la ID {request.DoctorId}. Revise la ID ingresada o intente crear una nueva disponibilidad");
-        }
-        var actualDate = DateOnly.FromDateTime(DateTime.Now);
-        var numOfDays = DateTime.DaysInMonth(actualDate.Year, actualDate.Month);
-        foreach (var rule in availabilities) 
+        if (!availabilities.Any()) throw new EntityNotFoundException($"No se encontraron disponibilidades asociadas a la ID {request.DoctorId}...");
+
+        var today = DateOnly.FromDateTime(DateTime.Now);
+        var numOfDays = DateTime.DaysInMonth(today.Year, today.Month);
+
+        foreach (var rule in availabilities)
         {
             foreach (var daySchedule in request.Days)
             {
                 if (daySchedule.EndTime < daySchedule.StartTime.AddMinutes(30))
-                {
                     throw new ArgumentOutOfRangeException("El horario de inicio debe ser 30 minutos menor al horario de fin.");
-                }
-                var dayOfWeek = daySchedule.Day.toDayOfWeek();
-                if (rule.DayOfWeek == (byte)dayOfWeek)
-                {
-                    if (rule.Slots.Any(s => s.Status != AvailabilitySlotStatus.AVAILABLE))
-                    {
-                        throw new InvalidOperationException("Existen turnos reservados/bloqueados para la disponiblidad actual. No es posible modificar los horarios asignados");
-                    }
-                    rule.StartTime = daySchedule.StartTime;
-                    rule.EndTime = daySchedule.EndTime;
-                    rule.Slots.Clear();
 
-                    foreach(var slot in GenerateSlots(request.DoctorId, daySchedule.StartTime, daySchedule.EndTime, dayOfWeek, actualDate, numOfDays))
-                    {
-                        rule.Slots.Add(slot);
-                    }
+                var dayOfWeek = daySchedule.Day.toDayOfWeek();
+                if (rule.DayOfWeek != (byte)dayOfWeek) continue;
+
+                var slotsViejosEnUso = rule.Slots.Where(s => s.Status != AvailabilitySlotStatus.AVAILABLE && s.Date >= today).ToList();
+                var slotViejosVacios = rule.Slots.Where(s => s.Status == AvailabilitySlotStatus.AVAILABLE && s.Date >= today).ToList();
+
+                foreach (var basura in slotViejosVacios)
+                {
+                    rule.Slots.Remove(basura);
                 }
+
+                var slotNuevos = GenerateSlots(request.DoctorId, daySchedule.StartTime, daySchedule.EndTime, dayOfWeek, today, numOfDays);
+              
+                var objetivo = slotsViejosEnUso.Select(s => $"{s.Date} | {s.StartTime} "); // de los slots viejos para identificarlos,traemos la fecha y tiempo de inicio, usando la interpolacion
+       
+                var slotsParaAgregar = slotNuevos.ExceptBy(objetivo, s => $"{s.Date} | {s.StartTime}");
+
+                foreach (var slotNuevo in slotsParaAgregar)
+                {
+                    rule.Slots.Add(slotNuevo);
+                }
+               
             }
         }
-        if (availabilities.Any())
-        {
-            await _persistence.UpdateRange(availabilities.ToList());
-        }
-        return new AvailabilityModel.Response(request.DoctorId, request.Days);
+
+        await _persistence.UpdateRange(availabilities.ToList());
+        return new AvailabilityModel.Response(request.DoctorId,request.Days);
     }
+
+    
 }
