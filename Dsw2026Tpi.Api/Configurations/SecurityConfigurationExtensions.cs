@@ -44,7 +44,7 @@ public static class SecurityConfigurationExtensions
                 policy.RequireRole(Roles.Administrator))
             .AddPolicy(Policies.PatientPolicy, policy =>
                 policy.RequireRole(Roles.Patient))
-            .AddPolicy(Policies.AmbosPolicy, policy => policy.RequireRole(Roles.Patient, Roles.Patient));
+            .AddPolicy(Policies.AdminAndPatientPolicy, policy => policy.RequireRole(Roles.Patient, Roles.Patient));
             
         return services;
     }

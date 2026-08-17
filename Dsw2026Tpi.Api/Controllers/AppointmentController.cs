@@ -28,6 +28,7 @@ public class AppointmentController : AppController
     }
 
     [HttpGet("patient")]
+    [Authorize(Policy = Policies.AdminAndPatientPolicy)]
     public async Task<IActionResult> GetPatientAppointments([FromQuery] string dni)
     {
         var result = await _service.GetPatientAppointmentsAsync(dni);
