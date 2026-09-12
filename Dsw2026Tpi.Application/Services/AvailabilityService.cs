@@ -130,17 +130,22 @@ public class AvailabilityService : IAvailabilityService
                 var dayOfWeek = daySchedule.Day.toDayOfWeek();
                 if (rule.DayOfWeek == (byte)dayOfWeek)
                 {
-                    if (rule.Slots.Any(s => s.Status != AvailabilitySlotStatus.AVAILABLE))
-                    {
-                        throw new InvalidOperationException("Existen turnos reservados/bloqueados para la disponiblidad actual. No es posible modificar los horarios asignados");
-                    }
+                    //if (rule.Slots.Any(s => s.Status != AvailabilitySlotStatus.AVAILABLE))
+                    //{
+                    //    throw new InvalidOperationException("Existen turnos reservados/bloqueados para la disponiblidad actual. No es posible modificar los horarios asignados");
+                    //} Versión anterior: si tenía turnos ocupados, no permitía modiicar la disponibilidad.
+
                     rule.StartTime = daySchedule.StartTime;
                     rule.EndTime = daySchedule.EndTime;
+                    var takenSlots = rule.Slots.Where(s => s.Status != AvailabilitySlotStatus.AVAILABLE).ToList();
                     rule.Slots.Clear();
-
                     foreach(var slot in GenerateSlots(request.DoctorId, daySchedule.StartTime, daySchedule.EndTime, dayOfWeek, actualDate, numOfDays))
                     {
                         rule.Slots.Add(slot);
+                    }
+                    foreach (var s in takenSlots) 
+                    {
+                        rule.Slots.Add(s);
                     }
                 }
             }

@@ -27,6 +27,7 @@ public class AppointmentController : AppController
         return Ok(response);
     }
 
+
     [HttpGet("patient")]
     public async Task<IActionResult> GetPatientAppointments([FromQuery] string dni)
     {
