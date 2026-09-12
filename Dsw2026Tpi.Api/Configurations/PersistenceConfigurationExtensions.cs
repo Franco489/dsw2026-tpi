@@ -23,7 +23,7 @@ public static class PersistenceConfigurationExtensions
             options.UseSqlServer(connectionString);
             options.UseSeeding((c, t) =>
             {
-                c.Seedwork<Speciality>("specialities");
+                c.Seedwork<Specialty>("specialities");
                 c.Seedwork<Doctor>("doctors");
             });
         });

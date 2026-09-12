@@ -22,7 +22,7 @@ public class DoctorService : IDoctorService
                                                    d.Name.Contains(name) && !d.Deleted, x => x.Name, nameof(Doctor.Speciality));
 
         return doctors.Map(d => new DoctorModel.Response(d.Id, d.Name, d.LicenseNumber,
-            new DoctorModel.SpecialityDto(d.Speciality?.Id, d.Speciality?.Name)));
+            new DoctorModel.SpecialtyDto(d.Speciality?.Id, d.Speciality?.Name)));
     }
 
 
@@ -42,26 +42,26 @@ public class DoctorService : IDoctorService
     public async Task<DoctorModel.Response> CreateDoctor(DoctorModel.Request request)
     {
         DoctorValidator.Validate(request);
-        var speciality = await _persistence.GetById<Speciality>(request.SpecialityId);
-        if(speciality == null)
+        var specialty = await _persistence.GetById<Specialty>(request.SpecialityId);
+        if(specialty == null)
         {
-            throw new EntityNotFoundException(nameof(Speciality));
+            throw new EntityNotFoundException(nameof(Specialty));
         }
 
         var doctor = new Doctor(request.Name, request.LicenseNumber, request.SpecialityId);
         await _persistence.Add(doctor);
 
         return new DoctorModel.Response(doctor.Id, doctor.Name, doctor.LicenseNumber,
-            new DoctorModel.SpecialityDto(speciality.Id, speciality.Name));
+            new DoctorModel.SpecialtyDto(specialty.Id, specialty.Name));
     }
 
 
     public async Task<DoctorModel.Response> UpdateDoctor(Guid id, DoctorModel.Request request)
     {
-        var speciality = await _persistence.GetById<Speciality>(request.SpecialityId);
-        if (speciality == null)
+        var specialty = await _persistence.GetById<Specialty>(request.SpecialityId);
+        if (specialty == null)
         {
-            throw new EntityNotFoundException(nameof(Speciality));
+            throw new EntityNotFoundException(nameof(Specialty));
         }
 
         var doctor = await _persistence.GetById<Doctor>(id);
@@ -74,7 +74,7 @@ public class DoctorService : IDoctorService
         await _persistence.Update(doctor);
 
         return new DoctorModel.Response(doctor.Id, doctor.Name, doctor.LicenseNumber,
-            new DoctorModel.SpecialityDto(speciality.Id, speciality.Name));
+            new DoctorModel.SpecialtyDto(specialty.Id, specialty.Name));
     }
 
     public async Task DeleteDoctor(Guid id)

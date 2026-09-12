@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Dsw2026Tpi.Application.Dtos
 {
-    public record SpecialityModel
+    public record SpecialtyModel
     {
         public record Request(string name, string description);
         public record UpdateRequest(string name, string description);

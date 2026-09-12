@@ -8,7 +8,7 @@ namespace Dsw2026Tpi.Domain.Entities
     {
         public string Name { get; set; }
         public string LicenseNumber { get; set; }
-        public Speciality Speciality { get; set; }
+        public Specialty Speciality { get; set; }
         public Guid SpecialityId { get; set; }
         public List<Availability> AvailabilityRules { get; set; }
 

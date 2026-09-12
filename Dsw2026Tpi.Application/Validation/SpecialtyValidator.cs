@@ -8,10 +8,10 @@ using System.Text;
 
 namespace Dsw2026Tpi.Application.Validation
 {
-    public class SpecialityValidator
+    public class SpecialtyValidator
     {
         
-        public static void Validate(SpecialityModel.Request request)
+        public static void Validate(SpecialtyModel.Request request)
         {
             var errores = new List<(string, string)>(); // Una lista de tuplas, (campo, descripcion de su error)
 

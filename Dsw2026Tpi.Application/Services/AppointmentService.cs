@@ -26,7 +26,7 @@ public class AppointmentService : IAppointmentService
 
     public async Task<AppointmentModel.Response> CreateAppointment(AppointmentModel.Request request)
     {
-        var doctor = await _persistence.GetById<Doctor>(request.DoctorId, "AvailabilityRules", "AvailabilityRules.Slots", "Speciality");
+        var doctor = await _persistence.GetById<Doctor>(request.DoctorId, "AvailabilityRules", "AvailabilityRules.Slots", "Specialty");
         var availabilitySlot = await _persistence.First<AvailabilitySlot>(s => s.Id == request.AvailabilitySlotId && s.Availability.DoctorId == request.DoctorId);
         var patient = await _persistence.First<Patient>(p => p.Dni == request.Patient.Dni);
 
@@ -65,7 +65,7 @@ public class AppointmentService : IAppointmentService
 
         List<AppointmentModel.Response> result = [];
         var appointments = await _persistence.GetFiltered<Appointment>((a => a.PatientId == patient.Id && a.Status == AppointmentStatus.BOOKED),
-            "Patient", "AvailabilitySlot", "AvailabilitySlot.Availability", "AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Speciality");
+            "Patient", "AvailabilitySlot", "AvailabilitySlot.Availability", "AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Specialty");
 
         foreach (var a in appointments)
         {
@@ -93,7 +93,7 @@ public class AppointmentService : IAppointmentService
     public async Task<AppointmentModel.ResponseDates> GetAppointmentsByDate (DateOnly date)
     {
         var appointments = await _persistence.GetFiltered<Appointment>(a => a.AvailabilitySlot.Date == date, "Patient", "AvailabilitySlot"
-            , "AvailabilitySlot.Availability", "AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Speciality");
+            , "AvailabilitySlot.Availability", "AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Specialty");
         if (!appointments.Any())
         {
             throw new EntityNotFoundException(nameof(Appointment));
@@ -121,7 +121,7 @@ public class AppointmentService : IAppointmentService
 
         var response = await _persistence.Paginate<Appointment, string>(pageSize, pageIndex,
             combinedPredicate,
-            r => r.Patient.Dni, "Patient", "AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Speciality"
+            r => r.Patient.Dni, "Patient", "AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Specialty"
         );
 
         return response.Map(r => new AppointmentModel.Response(r.Id, r.Status.ToString(), r.AvailabilitySlot.Date,

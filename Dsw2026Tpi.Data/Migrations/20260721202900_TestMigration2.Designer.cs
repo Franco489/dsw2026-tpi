@@ -221,7 +221,7 @@ namespace Dsw2026Tpi.Data.Migrations
                     b.ToTable("Patients", (string)null);
                 });
 
-            modelBuilder.Entity("Dsw2026Tpi.Domain.Entities.Speciality", b =>
+            modelBuilder.Entity("Dsw2026Tpi.Domain.Entities.Specialty", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -292,13 +292,13 @@ namespace Dsw2026Tpi.Data.Migrations
 
             modelBuilder.Entity("Dsw2026Tpi.Domain.Entities.Doctor", b =>
                 {
-                    b.HasOne("Dsw2026Tpi.Domain.Entities.Speciality", "Speciality")
+                    b.HasOne("Dsw2026Tpi.Domain.Entities.Specialty", "Specialty")
                         .WithMany()
                         .HasForeignKey("SpecialityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Speciality");
+                    b.Navigation("Specialty");
                 });
 
             modelBuilder.Entity("Dsw2026Tpi.Domain.Entities.Availability", b =>

@@ -4,14 +4,14 @@ using System.Text;
 
 namespace Dsw2026Tpi.Domain.Entities
 {
-    public class Speciality: EntityBase
+    public class Specialty: EntityBase
     {
         public string Name { get; set; }
         public string Description { get; set; }
         public bool IsActive { get; set; } = true;
         //ICollection<Doctor> Doctors { get; set; } = [];
 
-        public Speciality(string name, string description) 
+        public Specialty(string name, string description) 
         {
             Name = name;
             Description = description;
