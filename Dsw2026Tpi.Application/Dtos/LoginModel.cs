@@ -8,6 +8,7 @@ public record LoginAdminModel
 
 public record LoginPatientModel
 {
-    public record Request(string Email, string Dni);
+    //cambiamos string a long
+    public record Request(string Email, long Dni);
     public record Response(string? Token, string? Role);
 }

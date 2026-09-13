@@ -21,7 +21,8 @@ public class AuthenticationService : IAuthenticationService
     private readonly ILogger<AuthenticationService> _logger;
     private readonly IPersistence _persistence;
 
-    public AuthenticationService(UserManager<ApplicationUser> userManager,
+    public AuthenticationService(
+        UserManager<ApplicationUser> userManager,
         ISignInService signInManager,
         RoleManager<IdentityRole> roleManager,
         JwtService jwtService,
@@ -50,7 +51,7 @@ public class AuthenticationService : IAuthenticationService
 
         var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault(); 
 
-        var token  = _jwtService.GenerateToken(user.UserName!, role);
+        var token = _jwtService.GenerateToken(user.UserName!, role);
 
         return new LoginAdminModel.Response(
             token,
@@ -60,18 +61,20 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<LoginPatientModel.Response> LoginPatient(LoginPatientModel.Request request)
     {
-        if (!request.Email.IsEmailValid() || !request.Dni.IsDniValid()) 
+        string dniStr = request.Dni.ToString();
+
+        if (!request.Email.IsEmailValid() || !dniStr.IsDniValid())
         {
             throw new ValidationException(ErrorCodes.LOGIN_USER_INVALID,
             nameof(ErrorCodes.LOGIN_USER_INVALID)); 
+            throw new ValidationException(ErrorCodes.REGISTER_USER_INVALID, nameof(ErrorCodes.REGISTER_USER_INVALID));
         }
-        var patient = await _persistence.First<Patient>(p => p.Dni == request.Dni);
+        var patient = await _persistence.First<Patient>(p => p.Dni == dniStr);
 
         if (patient == null)
         {
-            //Si el paciente no está en la BD, primero lo registramos con identity y luego lo agregamos a la tabla pacientes.
             var user = await _userManager.FindByEmailAsync(request.Email);
-            if (user == null) 
+            if (user == null)
             {
                 user = new ApplicationUser
                 {
@@ -81,7 +84,7 @@ public class AuthenticationService : IAuthenticationService
                     UpdatedAt = DateTime.UtcNow
                 };
                 var result = await _userManager.CreateAsync(user);
-                if(!result.Succeeded)
+                if (!result.Succeeded)
                 {
                     throw new ConflictException(nameof(ErrorCodes.REGISTER_USER_CONFLICT),
                         ErrorCodes.REGISTER_USER_CONFLICT)
@@ -89,10 +92,11 @@ public class AuthenticationService : IAuthenticationService
                 }
                 await _userManager.AddToRoleAsync(user, Roles.Patient);
             }
-            await _persistence.Add(new Patient { UserId = Guid.Parse(user.Id), Email = request.Email, Dni = request.Dni});
-            _logger.LogInformation("Entidad paciente registrada: {Dni}", request.Dni);
+
+            await _persistence.Add(new Patient { UserId = Guid.Parse(user.Id), Email = request.Email, Dni = dniStr });
+            _logger.LogInformation("Entidad paciente registrada: {Dni}", dniStr);
         }
-        else 
+        else
         {
             if (!string.Equals(patient.Email, request.Email, StringComparison.OrdinalIgnoreCase))
             {
@@ -101,7 +105,8 @@ public class AuthenticationService : IAuthenticationService
             }
             
         }
-        var token = _jwtService.GenerateToken(request.Dni, Roles.Patient);
+
+        var token = _jwtService.GenerateToken(dniStr, Roles.Patient);
         return new LoginPatientModel.Response(token, Roles.Patient);
     }
 
@@ -123,7 +128,7 @@ public class AuthenticationService : IAuthenticationService
         if (!result.Succeeded) throw new ConflictException(nameof(ErrorCodes.REGISTER_USER_CONFLICT),
             ErrorCodes.REGISTER_USER_CONFLICT)
                 .WithDetail(result.Errors.Select(e => (e.Code, e.Description)));
-       
+
         _ = await _userManager.AddToRoleAsync(user, Roles.Administrator);
 
         _logger.LogInformation("Usuario registrado: {Email}", request.Email);

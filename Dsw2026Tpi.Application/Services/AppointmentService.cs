@@ -28,7 +28,8 @@ public class AppointmentService : IAppointmentService
     {
         var doctor = await _persistence.GetById<Doctor>(request.DoctorId, "AvailabilityRules", "AvailabilityRules.Slots", "Specialty");
         var availabilitySlot = await _persistence.First<AvailabilitySlot>(s => s.Id == request.AvailabilitySlotId && s.Availability.DoctorId == request.DoctorId);
-        var patient = await _persistence.First<Patient>(p => p.Dni == request.Patient.Dni);
+        string patientDni = request.Patient.Dni.ToString();
+        var patient = await _persistence.First<Patient>(p => p.Dni == patientDni);
 
         AppointmentValidator.ValidateCreate(doctor, availabilitySlot, patient, request.Reason);
 
