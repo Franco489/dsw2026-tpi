@@ -15,5 +15,37 @@ namespace Dsw2026Tpi.Domain.Entities
         public Guid DoctorId { get; set; }
         public ICollection<AvailabilitySlot> Slots { get; set; } = [];
 
+        public List<AvailabilitySlot> GenerateSlots(Guid doctorId, TimeOnly startTime,
+        TimeOnly endTime, DayOfWeek dayOfWeek, DateOnly actualDate, int numOfDays)
+        {
+            for (int d = actualDate.Day; d <= numOfDays; d++)
+            {
+                var iterationDate = new DateOnly(actualDate.Year, actualDate.Month, d);
+
+                if (iterationDate.DayOfWeek == dayOfWeek && !iterationDate.IsHoliday())
+                {
+                    var slotStartTime = startTime;
+                    while (slotStartTime < endTime)
+                    {
+                        var slotEndTime = slotStartTime.AddMinutes(30);
+
+                        if (slotEndTime > endTime)
+                        {
+                            break;
+                        }
+                        Slots.Add(new AvailabilitySlot
+                        {
+                            Date = iterationDate,
+                            StartTime = slotStartTime,
+                            EndTime = slotEndTime,
+                            DoctorId = doctorId
+                        });
+                        slotStartTime = slotEndTime;
+                    }
+                }
+            }
+            return Slots.ToList();
+        }
+
     }
 }

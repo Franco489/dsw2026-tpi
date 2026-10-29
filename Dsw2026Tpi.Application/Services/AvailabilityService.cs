@@ -74,8 +74,10 @@ public class AvailabilityService : IAvailabilityService
 
         var numOfDays = DateTime.DaysInMonth(actualDate.Year, actualDate.Month);
 
+        //Esto sería tarea del Doctor.
         var avaRules = new List<Availability>();
-
+        var DayScheduleList = new List<DaySchedule>();
+        DayScheduleList = request.Days;
         foreach (var daySchedule in request.Days)
         {
             if (daySchedule.EndTime < daySchedule.StartTime.AddMinutes(30))
@@ -93,7 +95,8 @@ public class AvailabilityService : IAvailabilityService
                 EndTime = daySchedule.EndTime,
                 Slots = []
             };
-
+            
+            //Acá habría que cambiar por el método GenerateSlots de la entidad Availability.
             avaRule.Slots = GenerateSlots(request.DoctorId, daySchedule.StartTime, 
                 daySchedule.EndTime, dayOfWeek, actualDate, numOfDays);
             if (avaRule.Slots.Any())
