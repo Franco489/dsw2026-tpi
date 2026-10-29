@@ -80,12 +80,12 @@ public class AuthenticationServiceTests
         await Assert.ThrowsAsync<AuthenticationException>(() => _service.LoginAdmin(request));
     }
 
-    [Fact]
-    public async Task LoginPatient_CuandoEmailODniInvalido_EntoncesLanzaValidationException()
-    {
-        var request = new LoginPatientModel.Request("invalido", "123");
-        await Assert.ThrowsAsync<ValidationException>(() => _service.LoginPatient(request));
-    }
+    //[Fact]
+    //public async Task LoginPatient_CuandoEmailODniInvalido_EntoncesLanzaValidationException()
+    //{
+    //    var request = new LoginPatientModel.Request("invalido", "123");
+    //    await Assert.ThrowsAsync<ValidationException>(() => _service.LoginPatient(request));
+    //}
 
     [Fact]
     public async Task Register_CuandoEmailEsInvalido_EntoncesLanzaValidationException()

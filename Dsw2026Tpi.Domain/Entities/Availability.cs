@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿using Dsw2026Tpi.Domain.Utils;
 namespace Dsw2026Tpi.Domain.Entities
 {
     public class Availability: EntityBase

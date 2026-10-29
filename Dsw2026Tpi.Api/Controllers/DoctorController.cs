@@ -31,15 +31,9 @@ public class DoctorController : AppController
         return Ok(availabilities);
     }
 
-<<<<<<< HEAD
-
     [HttpPost]
     [Authorize(Policy = Policies.AdminPolicy)]
-=======
-    // si el profesor me pide que solo el admin cree o modique doctores debo agregar la politica [Authorize(Policy = Policies.AdminPolicy)] y eliminar los allowanonymus 
-    [HttpPost] //permite que cualquiera incluso sin loguearse cree un medico 
-    [AllowAnonymous]
->>>>>>> a7e87a9 (cambios DNI a long y mapeo a string para validacion y persistencia)
+
     public async Task<IActionResult> CreateDoctor(DoctorModel.Request request)
     {
         var doctor = await _service.CreateDoctor(request);

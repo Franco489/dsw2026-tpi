@@ -61,6 +61,7 @@ public class AvailabilityService : IAvailabilityService
 
     public async Task<AvailabilityModel.Response> CreateAvailabilitiesAsync(AvailabilityModel.Request request)
     {
+        //Tareas del servicio
         var doctor = await _persistence.GetById<Doctor>(request.DoctorId, "AvailabilityRules");
         if (doctor == null)
         {
@@ -70,43 +71,18 @@ public class AvailabilityService : IAvailabilityService
         {
             throw new ConflictException(nameof(ErrorCodes.AVAILABILITY_CONFLICT), ErrorCodes.AVAILABILITY_CONFLICT);
         }
-        var actualDate = DateOnly.FromDateTime(DateTime.Now);
-
-        var numOfDays = DateTime.DaysInMonth(actualDate.Year, actualDate.Month);
-
-        //Esto sería tarea del Doctor.
-        var avaRules = new List<Availability>();
         var DayScheduleList = new List<DaySchedule>();
-        DayScheduleList = request.Days;
-        foreach (var daySchedule in request.Days)
+        foreach (var daySchedule in request.Days) 
         {
-            if (daySchedule.EndTime < daySchedule.StartTime.AddMinutes(30))
-            {
-                throw new ArgumentOutOfRangeException("El horario de inicio debe ser 30 minutos menor al horario de fin.");
-            }
-            var dayOfWeek = daySchedule.Day.toDayOfWeek();
-            var avaRule = new Availability
-            {
-                DoctorId = doctor.Id,
-                Month = (byte)actualDate.Month,
-                Year = (short)actualDate.Year,
-                DayOfWeek = (byte)dayOfWeek,
-                StartTime = daySchedule.StartTime,
-                EndTime = daySchedule.EndTime,
-                Slots = []
-            };
-            
-            //Acá habría que cambiar por el método GenerateSlots de la entidad Availability.
-            avaRule.Slots = GenerateSlots(request.DoctorId, daySchedule.StartTime, 
-                daySchedule.EndTime, dayOfWeek, actualDate, numOfDays);
-            if (avaRule.Slots.Any())
-            {
-                avaRules.Add(avaRule);
-            }
+            DayScheduleList.Add(new DaySchedule(daySchedule.Day,daySchedule.StartTime,daySchedule.EndTime));
         }
-        if (avaRules.Any())
+
+        //Coordinación de la lógica de negocio
+        doctor.CreateAvailabilities(DayScheduleList);
+
+        if (doctor.HasAvailabilities())
         {
-            await _persistence.AddRange(avaRules);
+            await _persistence.AddRange(doctor.AvailabilityRules);
         }
 
         return new AvailabilityModel.Response(doctor.Id, request.Days);
