@@ -13,8 +13,10 @@ namespace Dsw2026Tpi.Data.Configuration
         {
             builder.ToTable("Patients");
             builder.HasIndex(p => p.Dni).IsUnique();
+            builder.Property(p => p.Email).HasMaxLength(150);
             builder.Property(p => p.Dni).HasMaxLength(10);
             builder.Property(p => p.Name).HasMaxLength(150);
+            builder.Property(p => p.PhoneNumber).HasMaxLength(20);
         }
     }
 }

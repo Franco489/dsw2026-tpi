@@ -117,14 +117,26 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="APPOINTMENT_CONFLICT" xml:space="preserve">
+    <value>El turno ya fue reservado</value>
+  </data>
+  <data name="APPOINTMENT_ERROR" xml:space="preserve">
+    <value>Se encontraron errores en los datos ingresados.</value>
+  </data>
   <data name="AUTHENTICATION_FAILED" xml:space="preserve">
     <value>Usuario o contraseña incorrectos</value>
   </data>
   <data name="AUTHORIZATION_FAILED" xml:space="preserve">
     <value>Se requieren permisos para la operación solicitada</value>
   </data>
+  <data name="AVAILABILITY_CONFLICT" xml:space="preserve">
+    <value>La disponibilidad ya se encuentra definida</value>
+  </data>
   <data name="ENTITY_NOTFOUND" xml:space="preserve">
     <value>La entidad {0} no se encontró</value>
+  </data>
+  <data name="LOGIN_USER_INVALID" xml:space="preserve">
+    <value>Datos de inicio de sesión no válidos</value>
   </data>
   <data name="REGISTER_USER_CONFLICT" xml:space="preserve">
     <value>Se produjo un error al registrar el usuario</value>

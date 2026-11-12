@@ -61,6 +61,24 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to El turno ya fue reservado.
+        /// </summary>
+        public static string APPOINTMENT_CONFLICT {
+            get {
+                return ResourceManager.GetString("APPOINTMENT_CONFLICT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Se encontraron errores en los datos ingresados..
+        /// </summary>
+        public static string APPOINTMENT_ERROR {
+            get {
+                return ResourceManager.GetString("APPOINTMENT_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Usuario o contraseña incorrectos.
         /// </summary>
         public static string AUTHENTICATION_FAILED {
@@ -79,11 +97,29 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to La disponibilidad ya se encuentra definida.
+        /// </summary>
+        public static string AVAILABILITY_CONFLICT {
+            get {
+                return ResourceManager.GetString("AVAILABILITY_CONFLICT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to La entidad {0} no se encontró.
         /// </summary>
         public static string ENTITY_NOTFOUND {
             get {
                 return ResourceManager.GetString("ENTITY_NOTFOUND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Datos de inicio de sesión no válidos.
+        /// </summary>
+        public static string LOGIN_USER_INVALID {
+            get {
+                return ResourceManager.GetString("LOGIN_USER_INVALID", resourceCulture);
             }
         }
         

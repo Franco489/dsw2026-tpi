@@ -23,6 +23,28 @@ public class ExceptionHandlingMiddleware
         {
             await _next(context);
         }
+  
+        catch (ValidationException ex)
+        {
+            _logger.LogError(ex, "Se produjo un error de validación de datos.");
+            await HandleExceptionAsync(context, ex);
+        }
+        catch (EntityNotFoundException ex)
+        {
+            _logger.LogError(ex, "No se encontró la entidad especificada.");
+            await HandleExceptionAsync(context, ex);
+        }
+        catch (ConflictException ex)
+        {
+            _logger.LogError(ex, "Se produjo un conflicto en la solicitud.");
+            await HandleExceptionAsync(context, ex);
+        }
+        catch (AuthorizationException ex)
+        {
+            _logger.LogError(ex, "Se produjo un error de autorización.");
+            await HandleExceptionAsync(context, ex);
+        }
+
         catch (Exception ex)
         {
             _logger.LogError(ex, "Se produjo un error durante el procesamiento de la solicitud");
@@ -43,7 +65,8 @@ public class ExceptionHandlingMiddleware
             AuthorizationException => HttpStatusCode.Unauthorized,
             _ => HttpStatusCode.InternalServerError,
         };
-        var result = JsonSerializer.Serialize(error);
+        var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }; 
+        var result = JsonSerializer.Serialize(error, options);
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)status;
         await context.Response.WriteAsync(result);

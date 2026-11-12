@@ -1,0 +1,37 @@
+﻿using Dsw2026Tpi.Application.Dtos;
+using Dsw2026Tpi.Application.Interfaces;
+using Dsw2026Tpi.Application.Services;
+using Dsw2026Tpi.CrossCutting.Identity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Dsw2026Tpi.Api.Controllers;
+
+[Route("api/availabilities")]
+[Authorize(Policy = Policies.AdminPolicy)]
+public class AvailabilityController : AppController
+{
+    private readonly IAvailabilityService _service;
+
+    public AvailabilityController(IAvailabilityService service)
+    {
+        _service = service;
+    }
+    
+    [HttpPost]
+    public async Task<IActionResult> CreateAvailabilities([FromBody] AvailabilityModel.Request request)
+    {
+        var availability = await _service.CreateAvailabilitiesAsync(request);
+        return Ok(availability);
+    }
+
+
+    [HttpPut]
+
+    public async Task<IActionResult> UpdateAvailabilities([FromBody] AvailabilityModel.Request request)
+    {
+        var availability = await _service.UpdateAvailabilitiesAsync(request);
+        return Ok(availability);
+    }
+
+}

@@ -1,4 +1,5 @@
-﻿using Dsw2026Tpi.Domain.Entities;
+﻿using Dsw2026Tpi.Data.Extensions;
+using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -14,17 +15,23 @@ public class PersistenceEf: IPersistence
         _context = context;
     }
 
-    public async Task<T> Add<T>(T entity) where T : EntityBase
+    public async Task<List<T>> AddRange<T>(List<T> entity) where T : EntityBase
+    {
+        await _context.AddRangeAsync(entity);
+        await _context.SaveChangesAsync();
+        return entity;
+    } 
+    public async Task<T> Add<T>(T entity) where T : EntityBase  
     {
         await _context.AddAsync(entity);
         await _context.SaveChangesAsync();
         return entity;
-    }
+    }   
 
     public async Task<T> Delete<T>(T entity) where T : EntityBase
     {
-        var a = entity.Id;
-        _context.Remove(entity);
+        entity.Delete();
+        _context.Update(entity);
         await _context.SaveChangesAsync();
         return entity;
     }
@@ -55,6 +62,18 @@ public class PersistenceEf: IPersistence
         await _context.SaveChangesAsync();
         return entity;
     }
+    public async Task<List<T>> UpdateRange<T>(List<T> entities) where T : EntityBase
+    {
+        foreach (var entity in entities) 
+        {
+            if (_context.Entry(entity).State == EntityState.Detached) 
+            {
+                _context.Update(entity);
+            }
+        }       
+        await _context.SaveChangesAsync();
+        return entities;
+    }
 
     public async Task<Pagination<T>> Paginate<T, TKey>(int pageSize, int pageIndex, Expression<Func<T, bool>> predicate, Expression<Func<T, TKey>> sortOrder, params string[] includes) where T : EntityBase
     {
@@ -64,7 +83,7 @@ public class PersistenceEf: IPersistence
         var filtered = Include(_context.Set<T>(), includes)
                  .Where(predicate)
                  .OrderBy(sortOrder);
-
+        
         var total = await filtered.CountAsync();
 
         
@@ -74,7 +93,7 @@ public class PersistenceEf: IPersistence
                     .Take(take)
                     .ToListAsync();
 
-            return new Pagination<T>(pageSize, pageIndex, total, data);
+            return new Pagination<T>(pageSize, pageIndex, data,total);
         }
         
         //la pagina existe
@@ -86,7 +105,7 @@ public class PersistenceEf: IPersistence
         //solo hay una pagina
         if (total < pageSize)
         {
-            return new Pagination<T>(pageSize, pageIndex, total, await filtered.ToListAsync());
+            return new Pagination<T>(pageSize, pageIndex, await filtered.ToListAsync(),total);
         }
 
         var targetPageIndex = pageIndex - 1;
@@ -100,7 +119,7 @@ public class PersistenceEf: IPersistence
 
             targetPageIndex--;
 
-            if (targetPageIndex < 0) return new Pagination<T>(pageSize, 0, 0, []);
+            if (targetPageIndex < 0) return new Pagination<T>(pageSize, 0, [], 0);
         }
     }
 
