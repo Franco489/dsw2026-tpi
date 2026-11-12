@@ -83,7 +83,7 @@ public class AuthenticationServiceTests
     [Fact]
     public async Task LoginPatient_CuandoEmailODniInvalido_EntoncesLanzaValidationException()
     {
-        var request = new LoginPatientModel.Request("invalido", "123");
+        var request = new LoginPatientModel.Request("invalido", 123);
         await Assert.ThrowsAsync<ValidationException>(() => _service.LoginPatient(request));
     }
 

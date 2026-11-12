@@ -63,6 +63,11 @@ public class Program
             app.MapHealthChecks("/health-check");
 
             Log.Information("Aplicación iniciada correctamente");
+            Console.WriteLine("|##################---------------###################|");
+            Console.WriteLine("|                                                    |");
+            Console.WriteLine("|                  API LEVANTADA                     |");
+            Console.WriteLine("|                                                    |");
+            Console.WriteLine("|##################---------------###################|");
 
             await app.RunAsync();
         }
