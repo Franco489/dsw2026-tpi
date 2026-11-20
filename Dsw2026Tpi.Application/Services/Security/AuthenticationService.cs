@@ -41,6 +41,7 @@ public class AuthenticationService : IAuthenticationService
     {
         if (!request.Email.IsEmailValid()) throw new ValidationException();
         var user = await _userManager.FindByEmailAsync(request.Email) ?? throw new AuthenticationException();
+        //TODO: validar contraseña antes de enviarla
         var result = await _signInManager.CheckPassword(user, request.Password);
 
         if (!result)
@@ -66,7 +67,7 @@ public class AuthenticationService : IAuthenticationService
         if (!request.Email.IsEmailValid() || !dniStr.IsDniValid())
         {
             throw new ValidationException(ErrorCodes.LOGIN_USER_INVALID,
-            nameof(ErrorCodes.LOGIN_USER_INVALID)); 
+            nameof(ErrorCodes.LOGIN_USER_INVALID)); //TODO: POR QUE HAY DOS???
             throw new ValidationException(ErrorCodes.REGISTER_USER_INVALID, nameof(ErrorCodes.REGISTER_USER_INVALID));
         }
         var patient = await _persistence.First<Patient>(p => p.Dni == dniStr);

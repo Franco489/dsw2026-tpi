@@ -59,6 +59,7 @@ public class ExceptionHandlingMiddleware
             new ErrorResponse(nameof(ErrorCodes.UNHANDLED_ERROR), ErrorCodes.UNHANDLED_ERROR);
         var status = ex switch
         {
+            //TODO: mapear authenticationException a un 400 o a un 401.
             ValidationException => HttpStatusCode.BadRequest,
             EntityNotFoundException => HttpStatusCode.NotFound,
             ConflictException or AuthenticationException => HttpStatusCode.Conflict,

@@ -26,7 +26,7 @@ public class AppointmentService : IAppointmentService
 
     public async Task<AppointmentModel.Response> CreateAppointment(AppointmentModel.Request request)
     {
-        var doctor = await _persistence.GetById<Doctor>(request.DoctorId, "AvailabilityRules", "AvailabilityRules.Slots", "Specialty");
+        var doctor = await _persistence.GetById<Doctor>(request.DoctorId, "AvailabilityRules", "AvailabilityRules.Slots", "Speciality");
         var availabilitySlot = await _persistence.First<AvailabilitySlot>(s => s.Id == request.AvailabilitySlotId && s.Availability.DoctorId == request.DoctorId);
         string patientDni = request.Patient.Dni.ToString();
         var patient = await _persistence.First<Patient>(p => p.Dni == patientDni);
@@ -41,6 +41,7 @@ public class AppointmentService : IAppointmentService
             AvailabilitySlot = availabilitySlot,
             AvailabilitySlotId = availabilitySlot.Id,
         };
+        newAppoiment.Book();
         try
         {
             await _persistence.Add(newAppoiment);
@@ -66,7 +67,7 @@ public class AppointmentService : IAppointmentService
 
         List<AppointmentModel.Response> result = [];
         var appointments = await _persistence.GetFiltered<Appointment>((a => a.PatientId == patient.Id && a.Status == AppointmentStatus.BOOKED),
-            "Patient", "AvailabilitySlot", "AvailabilitySlot.Availability", "AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Specialty");
+            "Patient", "AvailabilitySlot", "AvailabilitySlot.Availability", "AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Speciality");
 
         foreach (var a in appointments)
         {
@@ -94,7 +95,7 @@ public class AppointmentService : IAppointmentService
     public async Task<AppointmentModel.ResponseDates> GetAppointmentsByDate (DateOnly date)
     {
         var appointments = await _persistence.GetFiltered<Appointment>(a => a.AvailabilitySlot.Date == date, "Patient", "AvailabilitySlot"
-            , "AvailabilitySlot.Availability", "AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Specialty");
+            , "AvailabilitySlot.Availability", "AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Speciality");
         if (!appointments.Any())
         {
             throw new EntityNotFoundException(nameof(Appointment));
@@ -122,7 +123,7 @@ public class AppointmentService : IAppointmentService
 
         var response = await _persistence.Paginate<Appointment, string>(pageSize, pageIndex,
             combinedPredicate,
-            r => r.Patient.Dni, "Patient", "AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Specialty"
+            r => r.Patient.Dni, "Patient", "AvailabilitySlot.Availability.Doctor", "AvailabilitySlot.Availability.Doctor.Speciality"
         );
 
         return response.Map(r => new AppointmentModel.Response(r.Id, r.Status.ToString(), r.AvailabilitySlot.Date,

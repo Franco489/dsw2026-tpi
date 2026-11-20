@@ -14,7 +14,7 @@ namespace Dsw2026Tpi.Data.Configuration
             builder.ToTable("Appointments");
             builder.Property(a => a.Status).HasMaxLength(20);
             builder.Property(a => a.Reason).HasMaxLength(300);
-            builder.HasIndex(a => a.AvailabilitySlotId).IsUnique();
+            builder.HasIndex(a => a.AvailabilitySlotId).HasFilter("[Status] = 'BOOKED'").IsUnique(); //el filtro es necesario para que se pueda cancelar el turno y reutilizar el slot.
         }
     }
 }

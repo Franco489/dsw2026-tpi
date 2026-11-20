@@ -15,7 +15,7 @@ public static class ValidationsExtensions
         return !string.IsNullOrWhiteSpace(dni) &&
             dni.All(char.IsDigit) &&
             dni.Length <= 8 &&
-            dni.Length >= 8;
+            dni.Length >= 7;
             
     }
 }

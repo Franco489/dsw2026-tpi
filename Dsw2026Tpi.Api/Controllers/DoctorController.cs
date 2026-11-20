@@ -34,8 +34,6 @@ public class DoctorController : AppController
 
     [HttpPost]
     [Authorize(Policy = Policies.AdminPolicy)]
-    [HttpPost] 
-    [AllowAnonymous]
     public async Task<IActionResult> CreateDoctor(DoctorModel.Request request)
     {
         var doctor = await _service.CreateDoctor(request);

@@ -13,20 +13,27 @@ namespace Dsw2026Tpi.Domain.Entities
         public Patient Patient { get; set; }
         public Guid PatientId { get; set; }
         public Guid AvailabilitySlotId { get; set; }
-        private AvailabilitySlot _availabilitySlot;
-        public AvailabilitySlot AvailabilitySlot
-        {
-            get { return _availabilitySlot; }
-            set 
-            {
-                _availabilitySlot = value;
-                value.Book();
-            } 
-        }
+        public AvailabilitySlot AvailabilitySlot { get; set; }
+        //public AvailabilitySlot AvailabilitySlot
+        //{
+        //    get { return _availabilitySlot; }
+        //    set 
+        //    {
+        //        _availabilitySlot = value;
+        //        _availabilitySlot.Status == AvailabilitySlotStatus.BOOKED ? value.Book
+        //        value.Book();
+        //    } 
+        //}
         public void Update(AppointmentStatus status, string reason = "") 
         {
             Status = status;
             Reason = reason;
+        }
+        public void Book() 
+        {
+            Status = AppointmentStatus.BOOKED;
+            UpdatedAt = DateTime.Now;
+            AvailabilitySlot.Book();
         }
 
         public void Cancel()

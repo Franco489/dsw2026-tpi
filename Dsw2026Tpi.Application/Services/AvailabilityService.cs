@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text.Json;
 using static Dsw2026Tpi.Application.Dtos.AvailabilityModel;
 
@@ -57,6 +58,16 @@ public class AvailabilityService : IAvailabilityService
             }
         }
         return slots.ToList();
+    }
+
+    private List<AvailabilitySlot> UpdateSlots(TimeOnly actualStartTime, TimeOnly actualEndTime, TimeOnly newStartTime, TimeOnly newEndTime, IEnumerable<AvailabilitySlot> existingSlots)
+    {
+        //TODO: durisimo
+        if (newStartTime < actualStartTime) 
+        {
+
+        }
+        return [];
     }
 
     public async Task<AvailabilityModel.Response> CreateAvailabilitiesAsync(AvailabilityModel.Request request)
@@ -135,8 +146,10 @@ public class AvailabilityService : IAvailabilityService
                     //    throw new InvalidOperationException("Existen turnos reservados/bloqueados para la disponiblidad actual. No es posible modificar los horarios asignados");
                     //} Versión anterior: si tenía turnos ocupados, no permitía modiicar la disponibilidad.
 
+                    UpdateSlots(rule.StartTime, rule.EndTime, daySchedule.StartTime, daySchedule.EndTime,rule.Slots);
                     rule.StartTime = daySchedule.StartTime;
                     rule.EndTime = daySchedule.EndTime;
+
                     var takenSlots = rule.Slots.Where(s => s.Status != AvailabilitySlotStatus.AVAILABLE).ToList();
                     rule.Slots.Clear();
                     foreach(var slot in GenerateSlots(request.DoctorId, daySchedule.StartTime, daySchedule.EndTime, dayOfWeek, actualDate, numOfDays))
