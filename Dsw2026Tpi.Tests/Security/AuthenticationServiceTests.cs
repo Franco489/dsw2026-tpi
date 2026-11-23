@@ -54,10 +54,10 @@ public class AuthenticationServiceTests
     }
 
     [Fact]
-    public async Task LoginAdmin_CuandoEmailEsInvalido_EntoncesLanzaAuthenticationException()
+    public async Task LoginAdmin_CuandoEmailEsInvalido_EntoncesLanzaValidationException()
     {
         var request = new LoginAdminModel.Request("emailinvalido", "Password123!");
-        await Assert.ThrowsAsync<AuthenticationException>(() => _service.LoginAdmin(request));
+        await Assert.ThrowsAsync<ValidationException>(() => _service.LoginAdmin(request));
     }
 
     [Fact]
